@@ -16,6 +16,7 @@ builder.Services.AddSwaggerGen();
 string connection = builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddDbContext<ApiContext>(options => options.UseSqlServer(connection));
 builder.Services.AddTransient<iListOftypes, ListOfTypes>();
+builder.Services.AddTransient<iFinancinalOperations, FinancinalOperations>();
 
 var app = builder.Build();
 

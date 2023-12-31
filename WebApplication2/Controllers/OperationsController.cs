@@ -20,11 +20,10 @@ public class OperationsController:ControllerBase
         return _financinalOperations.GetOperation(id);
     }
 
-    [HttpPost("{id},{typeId},{dateTime},{amount},{typeName},{ExpenceOrIncome}")]
-    public string CreateOperation(string id, Guid typeId, string dateTime, float amount, string typeName,
-        ExpenceOrIncome expenceOrIncome)
+    [HttpPost("{id},{typeId},{dateTime},{amount}")]
+    public string CreateOperation(string id, Guid typeId, string dateTime, float amount)
     {
-        return _financinalOperations.CreateOperation(id, typeId, dateTime, amount, typeName, expenceOrIncome);
+        return _financinalOperations.CreateOperation(id, typeId, dateTime, amount);
     }
 
     [HttpPut("{id},{typesId},{dateTime},{amount}")]

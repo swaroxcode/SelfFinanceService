@@ -26,25 +26,15 @@ public class FinancinalOperations : iFinancinalOperations
         }
     }
 
-    public string CreateOperation(string id,Guid typeId,string dateTime,float amount,string typeName, ExpenceOrIncome expenceOrIncome)
+    public string CreateOperation(string id,Guid typeId,string dateTime,float amount)
     {
         Type type;
         if (!isOperationExist(Guid.Parse(id)))
         {
-            if (_listOfTypes.isTypeExist(typeId))
-            {
-                type = _listOfTypes.GetType(typeId);
-            }
-            else
-            {
-              type = _listOfTypes.CreateNewType(typeName, expenceOrIncome);
-                
-            }
-
             Guid newGuid = Guid.NewGuid();
             var currentDateTime = MoveToCorrectDate(dateTime);
             _apiContext.Operations.Add(new Operation()
-                { amount = amount, dateOfOperations = currentDateTime, id = newGuid, type = type });
+                { amount = amount, dateOfOperations = currentDateTime, id = newGuid, typeId = typeId});
             _apiContext.SaveChanges();
             return "Operation is created";
         }
@@ -68,7 +58,6 @@ public class FinancinalOperations : iFinancinalOperations
             if (_listOfTypes.isTypeExist(typesId))
             {
                 changeOperation.typeId = typesId;
-                changeOperation.type = _listOfTypes.GetType(typesId);
                 changeOperation.dateOfOperations = MoveToCorrectDate(dateTime);
                 changeOperation.amount = amount;
                 _apiContext.SaveChanges();
@@ -96,9 +85,9 @@ public class FinancinalOperations : iFinancinalOperations
     public Report DailyReport()
     {
         Report currentReport = new Report();
-        var today = MoveToCorrectDate(DateTime.Today.ToString());
+        var today = MoveToCorrectDate(DateTime.Today.ToString("MM-dd-yy"));
         List<Operation> dailyOperations = _apiContext.Operations.Where(
-            o => o.dateOfOperations.Equals(today)).ToList();
+            o => o.dateOfOperations.Equals(DateTime.Today)).ToList();
         return LookingForReport(dailyOperations);
     }
 
@@ -135,9 +124,10 @@ public class FinancinalOperations : iFinancinalOperations
     public Report LookingForReport(List<Operation> neededOperations)
     {
         var currentReport = new Report();
-        List<float> allIncome = neededOperations.Where(o => o.type.expenceOrIncome == ExpenceOrIncome.Income)
+        
+        List<float> allIncome = neededOperations.Where(o=>_listOfTypes.GetType(o.typeId).expenceOrIncome == ExpenceOrIncome.Income)
             .Select(o => o.amount).ToList();
-        List<float> allExpence = neededOperations.Where(o => o.type.expenceOrIncome == ExpenceOrIncome.Expence)
+        List<float> allExpence = neededOperations.Where(o=>_listOfTypes.GetType(o.typeId).expenceOrIncome == ExpenceOrIncome.Expence)
             .Select(o => o.amount).ToList();
         currentReport.totalExpence = TotalCharge(allExpence);
         currentReport.totalIncome = TotalCharge(allIncome);

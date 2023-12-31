@@ -6,7 +6,7 @@ namespace WebApplication2.Services;
 public interface iFinancinalOperations
 {
     public bool isOperationExist(Guid id);
-    public string CreateOperation(string id,Guid typeId,string dateTime,float amount,string typeName,ExpenceOrIncome expenceOrIncome);
+    public string CreateOperation(string id,Guid typeId,string dateTime,float amount);
     public string GetOperation(Guid id);
     public string UpdateOperation(Guid id, Guid typesId, string dateTime,
         float amount);
