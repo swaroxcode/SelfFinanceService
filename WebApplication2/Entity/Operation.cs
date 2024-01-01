@@ -8,6 +8,6 @@ public class Operation
     public Guid id { get; set; }
     public Guid typeId { get; set; }
     public DateTime dateOfOperations { get; set; }
-    public float amount { get; set; }
+    public double amount { get; set; }
     
 }

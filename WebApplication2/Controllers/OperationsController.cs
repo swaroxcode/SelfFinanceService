@@ -21,14 +21,14 @@ public class OperationsController:ControllerBase
     }
 
     [HttpPost("{id},{typeId},{dateTime},{amount}")]
-    public string CreateOperation(string id, Guid typeId, string dateTime, float amount)
+    public string CreateOperation(string id, Guid typeId, string dateTime, double amount)
     {
         return _financinalOperations.CreateOperation(id, typeId, dateTime, amount);
     }
 
     [HttpPut("{id},{typesId},{dateTime},{amount}")]
     public string UpdateOperation(Guid id, Guid typesId, string dateTime,
-        float amount)
+        double amount)
     {
        return _financinalOperations.UpdateOperation(id, typesId, dateTime, amount);
     }

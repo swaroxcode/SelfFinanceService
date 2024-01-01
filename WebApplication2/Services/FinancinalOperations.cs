@@ -26,13 +26,13 @@ public class FinancinalOperations : iFinancinalOperations
         }
     }
 
-    public string CreateOperation(string id,Guid typeId,string dateTime,float amount)
+    public string CreateOperation(string id,Guid typeId,string dateTime,double amount)
     {
         Type type;
         if (!isOperationExist(Guid.Parse(id)))
         {
             Guid newGuid = Guid.NewGuid();
-            var currentDateTime = MoveToCorrectDate(dateTime);
+            var currentDateTime = DateTime.Parse(dateTime);
             _apiContext.Operations.Add(new Operation()
                 { amount = amount, dateOfOperations = currentDateTime, id = newGuid, typeId = typeId});
             _apiContext.SaveChanges();
@@ -50,7 +50,7 @@ public class FinancinalOperations : iFinancinalOperations
         else return "Operations is not exist";
     }
 
-    public string UpdateOperation(Guid id,Guid typesId, string dateTime, float amount)
+    public string UpdateOperation(Guid id,Guid typesId, string dateTime, double amount)
     {
         if (isOperationExist(id))
         {
@@ -58,7 +58,7 @@ public class FinancinalOperations : iFinancinalOperations
             if (_listOfTypes.isTypeExist(typesId))
             {
                 changeOperation.typeId = typesId;
-                changeOperation.dateOfOperations = MoveToCorrectDate(dateTime);
+                changeOperation.dateOfOperations = DateTime.Parse(dateTime);
                 changeOperation.amount = amount;
                 _apiContext.SaveChanges();
                 return "Operations is changed";
@@ -85,34 +85,27 @@ public class FinancinalOperations : iFinancinalOperations
     public Report DailyReport()
     {
         Report currentReport = new Report();
-        var today = MoveToCorrectDate(DateTime.Today.ToString("MM-dd-yy"));
-        List<Operation> dailyOperations = _apiContext.Operations.Where(
-            o => o.dateOfOperations.Equals(DateTime.Today)).ToList();
+        var today = DateTime.Today;
+        List<Operation> dailyOperations = (from operation in _apiContext.Operations where operation.dateOfOperations.Equals(DateTime.Today)select operation).ToList();
         return LookingForReport(dailyOperations);
     }
 
     public Report CustomDaysReport(string startDate, string endDate)
     {
         
-        var _startDay = MoveToCorrectDate(startDate);
-        var _endDay = MoveToCorrectDate(endDate);
+        var _startDay =DateTime.Parse(startDate);
+        var _endDay = DateTime.Parse(endDate);
         List<Operation> customDateOperations = _apiContext.Operations.Where(o =>
             DateTime.Compare(o.dateOfOperations, _startDay) > 0 &
             DateTime.Compare(o.dateOfOperations, _endDay) < 0).ToList();
         return LookingForReport(customDateOperations);
 
     }
+    
 
-    public DateTime MoveToCorrectDate(string dateTime)
+    public double TotalCharge(List<double> chargeList)
     {
-        CultureInfo provider = CultureInfo.InvariantCulture;
-        string pattern = "MM-dd-yy";
-        return  DateTime.ParseExact(dateTime, pattern,provider);
-    }
-
-    public float TotalCharge(List<float> chargeList)
-    {
-        float totalcharge = 0;
+        double totalcharge = 0;
         foreach (var charge in chargeList)
         {
             totalcharge = totalcharge + charge;
@@ -125,9 +118,9 @@ public class FinancinalOperations : iFinancinalOperations
     {
         var currentReport = new Report();
         
-        List<float> allIncome = neededOperations.Where(o=>_listOfTypes.GetType(o.typeId).expenceOrIncome == ExpenceOrIncome.Income)
+        List<double> allIncome = neededOperations.Where(o=>_listOfTypes.GetType(o.typeId).expenceOrIncome == ExpenceOrIncome.Income)
             .Select(o => o.amount).ToList();
-        List<float> allExpence = neededOperations.Where(o=>_listOfTypes.GetType(o.typeId).expenceOrIncome == ExpenceOrIncome.Expence)
+        List<double> allExpence = neededOperations.Where(o=>_listOfTypes.GetType(o.typeId).expenceOrIncome == ExpenceOrIncome.Expence)
             .Select(o => o.amount).ToList();
         currentReport.totalExpence = TotalCharge(allExpence);
         currentReport.totalIncome = TotalCharge(allIncome);
