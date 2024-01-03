@@ -3,6 +3,7 @@ using WebApplication2.Services;
 using Microsoft.AspNetCore.Mvc.ModelBinding.Binders;
 using Microsoft.EntityFrameworkCore;
 using System.Formats.Asn1;
+using WebApplication2.DTO;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -15,8 +16,10 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 string connection = builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddDbContext<ApiContext>(options => options.UseSqlServer(connection));
-builder.Services.AddTransient<iListOftypes, ListOfTypes>();
-builder.Services.AddTransient<iFinancinalOperations, FinancinalOperations>();
+builder.Services.AddScoped<ITypeService,TypeService>();
+builder.Services.AddScoped<IOperationService, OperationsService>();
+builder.Services.AddScoped<IReportService, ReportService>();
+builder.Services.AddAutoMapper(typeof(Program));
 
 var app = builder.Build();
 

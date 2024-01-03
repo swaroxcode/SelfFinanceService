@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using WebApplication2.DTO;
 using WebApplication2.Services;
 
 namespace WebApplication2.Controllers;
@@ -7,35 +8,68 @@ namespace WebApplication2.Controllers;
 [Route("api/[controller]")]
 public class OperationsController:ControllerBase
 {
-    private readonly iFinancinalOperations _financinalOperations;
+    private readonly IOperationService _operationService;
 
-    public OperationsController(iFinancinalOperations financinalOperations)
+    public OperationsController(IOperationService operationService)
     {
-        _financinalOperations = financinalOperations;
+        _operationService = operationService;
     }
 
-    [HttpGet("{id}")]
-    public string GetAllOperation(Guid id)
+    [HttpGet("{OperationDTO ID}")]
+    public async Task<IActionResult> Get([FromBody]Guid operationDTOID)
     {
-        return _financinalOperations.GetOperation(id);
+        try
+        {
+            var getElem = await _operationService.Get(operationDTOID);
+            return Ok(getElem);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, "Internal Error");
+        }
     }
 
-    [HttpPost("{id},{typeId},{dateTime},{amount}")]
-    public string CreateOperation(string id, Guid typeId, string dateTime, double amount)
+    [HttpPost("{Type Id},{Date},{Amount Operation}")]
+    public async Task<IActionResult>Create([FromBody]Guid id,DateTime date,decimal amount)
     {
-        return _financinalOperations.CreateOperation(id, typeId, dateTime, amount);
+        try
+        {
+            await _operationService.Create(id, date, amount);
+            return Ok();
+        }
+        catch (Exception e)
+        {
+            return StatusCode(500, "Internal Error");
+        }
+        
     }
 
-    [HttpPut("{id},{typesId},{dateTime},{amount}")]
-    public string UpdateOperation(Guid id, Guid typesId, string dateTime,
-        double amount)
+    [HttpPut("{OperationDTO}")]
+    public async Task<IActionResult> Update([FromBody]OperationDTO operationDto)
     {
-       return _financinalOperations.UpdateOperation(id, typesId, dateTime, amount);
+        try
+        {
+            await _operationService.Update(operationDto.Id, operationDto.TypeId, operationDto.DateOfOperations,
+                operationDto.Amount);
+            return Ok();
+        }
+        catch
+        {
+            return StatusCode(500, "Internal Error");  
+        }
     }
 
     [HttpDelete("{id}")]
-    public string DeleteOperation(Guid id)
+    public async Task<IActionResult> Delete([FromRoute]Guid id)
     {
-        return _financinalOperations.RemoveOperation(id);
+        try
+        {
+            await _operationService.Remove(id);
+            return Ok();
+        }
+        catch
+        {
+            return StatusCode(500, "Internal Error");  
+        }
     }
 }

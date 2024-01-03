@@ -1,14 +1,16 @@
 {
   "version": 2,
-  "dgSpecHash": "wO8KI2I/Ox+baV6C2cqMo8WZ/iVP3rSX/h64damRGmUiQC7AiLTZmRjjN8F1DLbgtQuXtrrGlUpDf/Yw3y5h1g==",
+  "dgSpecHash": "08MzvLSptz30m3OsU0rPfOSLYQKGjE6dTSpwfM98tbk8Rfzmy26Lb3W3nEx8g3pXYpO3lSo8on1SghyjUkFh1w==",
   "success": true,
   "projectFilePath": "/Users/shldi/RiderProjects/WebApplication2/WebApplication2/WebApplication2.csproj",
   "expectedPackageFiles": [
+    "/Users/shldi/.nuget/packages/automapper/12.0.1/automapper.12.0.1.nupkg.sha512",
+    "/Users/shldi/.nuget/packages/automapper.extensions.microsoft.dependencyinjection/12.0.1/automapper.extensions.microsoft.dependencyinjection.12.0.1.nupkg.sha512",
     "/Users/shldi/.nuget/packages/azure.core/1.25.0/azure.core.1.25.0.nupkg.sha512",
     "/Users/shldi/.nuget/packages/azure.identity/1.7.0/azure.identity.1.7.0.nupkg.sha512",
     "/Users/shldi/.nuget/packages/microsoft.aspnetcore.openapi/7.0.13/microsoft.aspnetcore.openapi.7.0.13.nupkg.sha512",
     "/Users/shldi/.nuget/packages/microsoft.bcl.asyncinterfaces/1.1.1/microsoft.bcl.asyncinterfaces.1.1.1.nupkg.sha512",
-    "/Users/shldi/.nuget/packages/microsoft.csharp/4.5.0/microsoft.csharp.4.5.0.nupkg.sha512",
+    "/Users/shldi/.nuget/packages/microsoft.csharp/4.7.0/microsoft.csharp.4.7.0.nupkg.sha512",
     "/Users/shldi/.nuget/packages/microsoft.data.sqlclient/5.1.1/microsoft.data.sqlclient.5.1.1.nupkg.sha512",
     "/Users/shldi/.nuget/packages/microsoft.data.sqlclient.sni.runtime/5.1.0/microsoft.data.sqlclient.sni.runtime.5.1.0.nupkg.sha512",
     "/Users/shldi/.nuget/packages/microsoft.entityframeworkcore/7.0.14/microsoft.entityframeworkcore.7.0.14.nupkg.sha512",

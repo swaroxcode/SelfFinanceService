@@ -7,22 +7,22 @@ namespace WebApplication2.Controllers;
 [Route("api/[controller]")]
 public class ReportController:ControllerBase
 {
-    private readonly iFinancinalOperations _financinalOperations;
+    private readonly IReportService _reportService;
 
-    public ReportController(iFinancinalOperations iFinancinalOperations)
+    public ReportController(IReportService reportService)
     {
-        _financinalOperations = iFinancinalOperations;
+        _reportService = reportService;
     }
 
     [HttpGet]
-    public Report DailyReport()
+    public async Task<ReportDTO> DailyReport()
     {
-        return _financinalOperations.DailyReport();
+        return await _reportService.DailyReport();
     }
 
     [HttpGet("{startDate},{endDate}")]
-    public Report CustomDateReport(string startDate,string endDate)
+    public async Task<ReportDTO> CustomDateReport(string startDate,string endDate)
     {
-        return _financinalOperations.CustomDaysReport(startDate, endDate);
+        return await _reportService.CustomDaysReport(startDate, endDate);
     }
 }
