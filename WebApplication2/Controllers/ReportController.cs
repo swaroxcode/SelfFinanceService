@@ -15,14 +15,32 @@ public class ReportController:ControllerBase
     }
 
     [HttpGet]
-    public async Task<ReportDTO> DailyReport()
+    public async Task<IActionResult> DailyReport()
     {
-        return await _reportService.DailyReport();
+        try
+        {
+            var dailyReport = await _reportService.DailyReport();
+            return Ok(dailyReport);
+        }
+
+        catch (Exception ex)
+        {
+            return StatusCode(500, "Internal Error");
+        }
     }
 
     [HttpGet("{startDate},{endDate}")]
-    public async Task<ReportDTO> CustomDateReport(string startDate,string endDate)
+    public async Task<IActionResult> CustomDateReport(string startDate,string endDate)
     {
-        return await _reportService.CustomDaysReport(startDate, endDate);
+        try
+        {
+            var customReport = await _reportService.CustomDaysReport(startDate, endDate);
+            return Ok(customReport);
+        }
+
+        catch (Exception ex)
+        {
+            return StatusCode(500, "Internal Error");
+        }
     }
 }
