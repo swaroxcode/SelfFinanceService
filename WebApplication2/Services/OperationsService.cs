@@ -1,3 +1,4 @@
+using System.Net;
 using Microsoft.EntityFrameworkCore;
 
 namespace WebApplication2.Services;
@@ -7,7 +8,7 @@ public class OperationsService : IOperationService
     private readonly ApiContext _apiContext;
     private ITypeService _typeService;
 
-    public OperationsService(ApiContext apiContext,TypeService typeService)
+    public OperationsService(ApiContext apiContext,ITypeService typeService)
     {
         _apiContext = apiContext;
         _typeService = typeService;
@@ -45,18 +46,13 @@ public class OperationsService : IOperationService
 
     public async Task<Operation> Get(Guid id)
     {
-        if (isExist(id))
+        if (!isExist(id))
         {
-            var operation = await _apiContext.Operations.Where(o => o.Id.Equals(id)).FirstAsync();
-            return operation;
-        }
-        else
-        {
-            await Task.FromException<Operation>(new DirectoryNotFoundException("Type isnt found"));
-            return null;
+            throw new WebException("Element isnt find");
         }
 
-        
+        var operation = await _apiContext.Operations.Where(o => o.Id.Equals(id)).FirstAsync();
+        return operation;
     }
 
     public async Task<bool> Update(Guid id,Guid typesId, DateTime dateTime, decimal amount)
@@ -91,10 +87,10 @@ public class OperationsService : IOperationService
         else return false;
     }
 
-    public async Task<bool> isExist(Guid typeId, string dateTime, decimal amount)
+    public async Task<bool> isExist(Guid typeId, DateTime dateTime, decimal amount)
     {
         if (await _apiContext.Operations.Where(o =>
-                    o.TypeId.Equals(typeId) & o.DateOfOperations.CompareTo(DateTime.Parse(dateTime)) == 0 &
+                    o.TypeId.Equals(typeId) & o.DateOfOperations.CompareTo(dateTime) == 0 &
                     o.Amount == amount)
                 .FirstAsync() != null)
         {

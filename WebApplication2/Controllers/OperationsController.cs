@@ -15,7 +15,7 @@ public class OperationsController:ControllerBase
         _operationService = operationService;
     }
 
-    [HttpGet("{OperationDTO ID}")]
+    [HttpGet("ID")]
     public async Task<IActionResult> Get([FromBody]Guid operationDTOID)
     {
         try
@@ -29,7 +29,7 @@ public class OperationsController:ControllerBase
         }
     }
 
-    [HttpPost("{Type Id},{Date},{Amount Operation}")]
+    [HttpPost("Id,Date,Amount Operation")]
     public async Task<IActionResult>Create([FromBody]Guid id,DateTime date,decimal amount)
     {
         try

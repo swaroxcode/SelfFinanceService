@@ -39,18 +39,14 @@ public class TypeService : ITypeService
 
     public async Task<Type> Get(Guid id)
     {
-        if (await isExist(id))
+        if (!await isExist(id))
         {
-            Type type = await _apiContext.Types
-                .Where(t => t.Id.Equals(id))
-                .FirstAsync();
-            return type;
+            throw new WebException("Task isn`t found");
         }
-        else
-        {
-            Task.FromException<Type>(new DirectoryNotFoundException("Type isnt found"));
-            return null;
-        }
+        Type type = await _apiContext.Types
+            .Where(t => t.Id.Equals(id))
+            .FirstAsync();
+        return type;
     }
 
     public async Task<bool> Update(Guid id, string newTypeName,ExpenceOrIncome newExpenceOrIncome)

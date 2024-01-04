@@ -8,7 +8,7 @@ public class ReportService:IReportService
     private readonly ApiContext _apiContext;
     private ITypeService _typeService;
     
-    public ReportService(ApiContext apiContext,TypeService typeService)
+    public ReportService(ApiContext apiContext,ITypeService typeService)
     {
         _apiContext = apiContext;
         _typeService = typeService;

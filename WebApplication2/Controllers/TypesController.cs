@@ -25,7 +25,7 @@ public class TypesController : ControllerBase
         return _imapper.Map<List<TypeDTO>>(allTypes);
     }
 
-    [HttpPost("{Type Name},{Expence or Income")]
+    [HttpPost("Type Name,Expence or Income")]
     public async Task<IActionResult> CreateNew([FromRoute] string typeName,[FromBody]ExpenceOrIncome expenceOrIncome)
     {
         try
@@ -54,7 +54,7 @@ public class TypesController : ControllerBase
         }
     }
 
-    [HttpDelete("{ID}")]
+    [HttpDelete("ID")]
     public async Task<IActionResult> Remove([FromBody] Guid id)
     {
         try
