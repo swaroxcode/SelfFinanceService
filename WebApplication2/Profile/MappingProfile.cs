@@ -6,7 +6,7 @@ public class MappingProfile:AutoMapper.Profile
 {
     public MappingProfile()
     {
-        CreateMap<Operation, OperationDTO>();
+        CreateMap<Operation, OperationUpdateDTO>();
         CreateMap<Type, TypeDTO>();
         CreateMap<ReportDTO, ReportDTO>();
     }

@@ -18,19 +18,19 @@ public class TypesController : ControllerBase
         _imapper = imapper;
     }
 
-    [HttpGet("all")]
+    [HttpGet("Get All")]
     public async Task<List<TypeDTO>> GetAll()
     {
         var allTypes =await _typeService.GetAll();
         return _imapper.Map<List<TypeDTO>>(allTypes);
     }
 
-    [HttpPost("Type Name,Expence or Income")]
-    public async Task<IActionResult> CreateNew([FromRoute] string typeName,[FromBody]ExpenceOrIncome expenceOrIncome)
+    [HttpPost("Create")]
+    public async Task<IActionResult> CreateNew([FromQuery] CreateTypeDto createTypeDto)
     {
         try
         {
-            await _typeService.CreateNew(typeName, expenceOrIncome);
+            await _typeService.CreateNew(createTypeDto.TypeName,createTypeDto.ExpenceOrIncome);
             return Ok();
         }
         catch(Exception e)
@@ -40,8 +40,8 @@ public class TypesController : ControllerBase
         
     }
 
-    [HttpPut("{TypeDTO}")]
-    public async Task<IActionResult> Update([FromBody]TypeDTO typeDto)
+    [HttpPut("Update")]
+    public async Task<IActionResult> Update([FromQuery]TypeDTO typeDto)
     {
         try
         {
@@ -54,13 +54,13 @@ public class TypesController : ControllerBase
         }
     }
 
-    [HttpDelete("ID")]
-    public async Task<IActionResult> Remove([FromBody] Guid id)
+    [HttpDelete("Remove")]
+    public async Task<IActionResult> Remove([FromRoute] Guid id)
     {
         try
         {
             await _typeService.Remove(id);
-            return Ok();
+            return Ok(StatusCode(204));
         }
         catch(Exception e)
         {

@@ -16,20 +16,19 @@ public class ReportService:IReportService
     public async Task<ReportDTO> DailyReport()
     {
         ReportDTO currentReportDto = new ReportDTO();
-        var today = DateTime.Today;
-        List<Operation> dailyOperations = await (from operation in _apiContext.Operations where operation.DateOfOperations.Equals(DateTime.Today)select operation).ToListAsync();
+        currentReportDto.OperationDate = DateOnly.Parse(DateTime.Today.ToString());
+        List<Operation> dailyOperations = await (from operation in _apiContext.Operations where operation.DateOfOperations.Equals(currentReportDto.OperationDate)select operation).ToListAsync();
         return LookingForReport(dailyOperations);
     }
 
     public async Task<ReportDTO> CustomDaysReport(string startDate, string endDate)
     {
-        
-        var _startDay =DateTime.Parse(startDate);
-        var _endDay = DateTime.Parse(endDate);
+        var _startDay =DateOnly.Parse(startDate);
+        var _endDay = DateOnly.Parse(endDate);
         List<Operation> customDateOperations = await _apiContext.Operations.Where(o =>
-            DateTime.Compare(o.DateOfOperations, _startDay) > 0 &
-            DateTime.Compare(o.DateOfOperations, _endDay) < 0).ToListAsync();
-        return LookingForReport(customDateOperations);
+            o.DateOfOperations.CompareTo(_startDay) > 0 &
+            o.DateOfOperations.CompareTo( _endDay) < 0).ToListAsync();
+        return LookingForReport(customDateOperations,startDate,endDate);
 
     }
     
@@ -44,17 +43,22 @@ public class ReportService:IReportService
 
         return totalcharge;
     }
-    
-    public ReportDTO LookingForReport(List<Operation> neededOperations)
+
+    public ReportDTO LookingForReport(List<Operation> neededOperation, string startDay = null, string endDay = null)
     {
         var currentReport = new ReportDTO();
-        List<decimal> allIncome = neededOperations.Where(o=> _typeService.Get(o.TypeId).Result.ExpenceOrIncome == ExpenceOrIncome.Income)
+        if (startDay != null && endDay != null)
+        {
+            currentReport.StartDate = DateOnly.Parse(startDay);
+            currentReport.EndDate = DateOnly.Parse(endDay);
+        }
+    List<decimal> allIncome = neededOperation.Where(o=> _typeService.Get(o.TypeId).Result.ExpenceOrIncome == ExpenceOrIncome.Income)
             .Select(o => o.Amount).ToList();
-        List<decimal> allExpence = neededOperations.Where(o=>_typeService.Get(o.TypeId).Result.ExpenceOrIncome == ExpenceOrIncome.Expence)
+        List<decimal> allExpence = neededOperation.Where(o=>_typeService.Get(o.TypeId).Result.ExpenceOrIncome == ExpenceOrIncome.Expence)
             .Select(o => o.Amount).ToList();
         currentReport.TotalExpence = TotalCharge(allExpence);
         currentReport.TotalIncome = TotalCharge(allIncome);
-        currentReport.ListOfCurrentOperations = neededOperations;
+        currentReport.ListOfCurrentOperations = neededOperation;
         return currentReport;
     }
 }

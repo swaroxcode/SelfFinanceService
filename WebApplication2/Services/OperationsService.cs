@@ -25,7 +25,7 @@ public class OperationsService : IOperationService
         }
     }
 
-    public async Task<bool> Create(Guid typeId,DateTime dateTime,decimal amount)
+    public async Task<bool> Create(Guid typeId,DateOnly dateTime,decimal amount)
     {
         if (! await isExist(typeId,dateTime,amount))
         {
@@ -55,16 +55,16 @@ public class OperationsService : IOperationService
         return operation;
     }
 
-    public async Task<bool> Update(Guid id,Guid typesId, DateTime dateTime, decimal amount)
+    public async Task<bool> Update(Operation operation)
     {
-        if (isExist(id))
+        if (isExist(operation.Id))
         {
-            var changeOperation = await _apiContext.Operations.Where(o => o.Id.Equals(id)).FirstAsync();
-            if (await _typeService.isExist(typesId))
+            var changeOperation = await _apiContext.Operations.Where(o => o.Id.Equals(operation.Id)).FirstAsync();
+            if (await _typeService.isExist(operation.TypeId))
             {
-                changeOperation.TypeId = typesId;
-                changeOperation.DateOfOperations = dateTime;
-                changeOperation.Amount = amount;
+                changeOperation.TypeId = operation.TypeId;
+                changeOperation.DateOfOperations = operation.DateOfOperations;
+                changeOperation.Amount = operation.Amount;
                 await _apiContext.SaveChangesAsync();
                 return true;
             }
@@ -87,7 +87,7 @@ public class OperationsService : IOperationService
         else return false;
     }
 
-    public async Task<bool> isExist(Guid typeId, DateTime dateTime, decimal amount)
+    public async Task<bool> isExist(Guid typeId, DateOnly dateTime, decimal amount)
     {
         if (await _apiContext.Operations.Where(o =>
                     o.TypeId.Equals(typeId) & o.DateOfOperations.CompareTo(dateTime) == 0 &

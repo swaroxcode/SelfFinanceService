@@ -15,13 +15,14 @@ public class OperationsController:ControllerBase
         _operationService = operationService;
     }
 
-    [HttpGet("ID")]
-    public async Task<IActionResult> Get([FromBody]Guid operationDTOID)
+    [HttpGet]
+    [Route("{id:guid}")]
+    public async Task<IActionResult> Get(Guid id)
     {
         try
         {
-            var getElem = await _operationService.Get(operationDTOID);
-            return Ok(getElem);
+            var element = await _operationService.Get(id);
+            return Ok(element);
         }
         catch (Exception ex)
         {
@@ -29,12 +30,13 @@ public class OperationsController:ControllerBase
         }
     }
 
-    [HttpPost("Id,Date,Amount Operation")]
-    public async Task<IActionResult>Create([FromBody]Guid id,DateTime date,decimal amount)
+    [HttpPost("Create")]
+    public async Task<IActionResult>Create([FromQuery]OperationCreateDto operationCreateDto)
     {
+        
         try
         {
-            await _operationService.Create(id, date, amount);
+            await _operationService.Create(operationCreateDto.id,operationCreateDto.date,operationCreateDto.amount);
             return Ok();
         }
         catch (Exception e)
@@ -43,14 +45,20 @@ public class OperationsController:ControllerBase
         }
         
     }
-
-    [HttpPut("{OperationDTO}")]
-    public async Task<IActionResult> Update([FromBody]OperationDTO operationDto)
+    
+    [HttpPut("Update")]
+    public async Task<IActionResult> Update([FromQuery]OperationUpdateDTO operationUpdateDto)
     {
+        var operationDTO = new Operation
+        {
+            DateOfOperations = operationUpdateDto.DateOfOperations,
+            TypeId = operationUpdateDto.TypeId,
+            Id = operationUpdateDto.Id,
+            Amount = operationUpdateDto.Amount
+        };
         try
         {
-            await _operationService.Update(operationDto.Id, operationDto.TypeId, operationDto.DateOfOperations,
-                operationDto.Amount);
+            await _operationService.Update(operationDTO);
             return Ok();
         }
         catch
@@ -58,14 +66,14 @@ public class OperationsController:ControllerBase
             return StatusCode(500, "Internal Error");  
         }
     }
-
-    [HttpDelete("{id}")]
+    
+    [HttpDelete("{id:guid}")]
     public async Task<IActionResult> Delete([FromRoute]Guid id)
     {
         try
         {
             await _operationService.Remove(id);
-            return Ok();
+            return Ok(StatusCode(204));
         }
         catch
         {
