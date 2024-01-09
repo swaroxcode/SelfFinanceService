@@ -14,7 +14,7 @@ public class ReportService : IReportService
         _typeService = typeService;
     }
 
-    public async Task<ReportDTO> DailyReport(DateOnly dateOfOperation)
+    public async Task<ReportDTO> DailyReport(DateTime dateOfOperation)
     {
         var currentReportDto = new ReportDTO();
         List<Operation> dailyOperations = await (from
@@ -25,7 +25,7 @@ public class ReportService : IReportService
         return LookingForReport(dailyOperations);
     }
 
-    public async Task<ReportDTO> CustomDaysReport(DateOnly startDate, DateOnly endDate)
+    public async Task<ReportDTO> CustomDaysReport(DateTime startDate, DateTime endDate)
     {
         var customDateOperations = await _apiContext.Operations.Where(o =>
             (o.DateOfOperations.CompareTo(startDate) > 0) &

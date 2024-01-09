@@ -9,8 +9,8 @@ namespace WebApplication2.Controllers;
 [Route("api/[controller]")]
 public class TypesController : ControllerBase
 {
-    private readonly ITypeService _typeService;
     private readonly IMapper _imapper;
+    private readonly ITypeService _typeService;
 
     public TypesController(ITypeService typeService, IMapper imapper)
     {

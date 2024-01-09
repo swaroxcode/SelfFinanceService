@@ -1,5 +1,4 @@
 using Microsoft.AspNetCore.Mvc;
-using WebApplication2.DTO;
 using WebApplication2.Services;
 
 namespace WebApplication2.Controllers;
@@ -16,7 +15,7 @@ public class ReportController : ControllerBase
     }
 
     [HttpGet("{dayOfOperation}")]
-    public async Task<IActionResult> DailyReport([FromQuery] DateOnly dayOfOperation)
+    public async Task<IActionResult> DailyReport([FromQuery] DateTime dayOfOperation)
     {
         try
         {
@@ -30,8 +29,8 @@ public class ReportController : ControllerBase
         }
     }
 
-    [HttpGet("{startDate},{endDate}")]
-    public async Task<IActionResult> CustomDateReport([FromQuery] DateOnly startDate, [FromQuery] DateOnly endDate)
+    [HttpGet("{startDate:datetime},{endDate:datetime}")]
+    public async Task<IActionResult> CustomDateReport([FromQuery] DateTime startDate, [FromQuery] DateTime endDate)
     {
         try
         {
