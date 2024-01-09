@@ -17,11 +17,10 @@ public class ReportService : IReportService
     public async Task<ReportDTO> DailyReport(DateOnly dateOfOperation)
     {
         var currentReportDto = new ReportDTO();
-        currentReportDto.OperationDate = dateOfOperation;
         List<Operation> dailyOperations = await (from
                 operation in _apiContext.Operations
             where operation.DateOfOperations.Equals(
-                currentReportDto.OperationDate)
+                dateOfOperation)
             select operation).ToListAsync();
         return LookingForReport(dailyOperations);
     }
@@ -31,25 +30,19 @@ public class ReportService : IReportService
         var customDateOperations = await _apiContext.Operations.Where(o =>
             (o.DateOfOperations.CompareTo(startDate) > 0) &
             (o.DateOfOperations.CompareTo(endDate) < 0)).ToListAsync();
-        return LookingForReport(customDateOperations, startDate.ToString(), endDate.ToString());
+        return LookingForReport(customDateOperations);
     }
 
 
     public decimal TotalCharge(List<decimal> chargeList)
     {
-        decimal totalcharge = chargeList.Sum();
+        var totalcharge = chargeList.Sum();
         return totalcharge;
     }
 
-    public ReportDTO LookingForReport(List<Operation> neededOperation, string startDay = null, string endDay = null)
+    public ReportDTO LookingForReport(List<Operation> neededOperation)
     {
         var currentReport = new ReportDTO();
-        if (startDay != null && endDay != null)
-        {
-            currentReport.StartDate = DateOnly.Parse(startDay);
-            currentReport.EndDate = DateOnly.Parse(endDay);
-        }
-
         var allIncome = neededOperation.Where
                 (o => _typeService.Get(o.TypeId).Result.ExpenceOrIncome == ExpenceOrIncome.Income)
             .Select(o => o.Amount).ToList();
