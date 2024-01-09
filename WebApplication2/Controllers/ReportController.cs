@@ -3,9 +3,10 @@ using WebApplication2.DTO;
 using WebApplication2.Services;
 
 namespace WebApplication2.Controllers;
+
 [ApiController]
 [Route("api/[controller]")]
-public class ReportController:ControllerBase
+public class ReportController : ControllerBase
 {
     private readonly IReportService _reportService;
 
@@ -14,12 +15,12 @@ public class ReportController:ControllerBase
         _reportService = reportService;
     }
 
-    [HttpGet("Daily")]
-    public async Task<IActionResult> DailyReport()
+    [HttpGet("{dayOfOperation}")]
+    public async Task<IActionResult> DailyReport([FromQuery] DateOnly dayOfOperation)
     {
         try
         {
-            var dailyReport = await _reportService.DailyReport();
+            var dailyReport = await _reportService.DailyReport(dayOfOperation);
             return Ok(dailyReport);
         }
 
@@ -30,7 +31,7 @@ public class ReportController:ControllerBase
     }
 
     [HttpGet("Period")]
-    public async Task<IActionResult> CustomDateReport([FromQuery]string startDate,string endDate)
+    public async Task<IActionResult> CustomDateReport([FromQuery] DateOnly startDate, [FromQuery] DateOnly endDate)
     {
         try
         {

@@ -1,7 +1,8 @@
-namespace WebApplication2;
-
-public enum ExpenceOrIncome
+namespace WebApplication2
 {
-    Expence,
-    Income
+    public enum ExpenceOrIncome
+    {
+        Expence,
+        Income
+    }
 }

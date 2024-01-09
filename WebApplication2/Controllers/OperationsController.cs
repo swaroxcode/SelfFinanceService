@@ -6,7 +6,7 @@ namespace WebApplication2.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class OperationsController:ControllerBase
+public class OperationsController : ControllerBase
 {
     private readonly IOperationService _operationService;
 
@@ -15,8 +15,7 @@ public class OperationsController:ControllerBase
         _operationService = operationService;
     }
 
-    [HttpGet]
-    [Route("{id:guid}")]
+    [HttpGet("{id:guid}")]
     public async Task<IActionResult> Get(Guid id)
     {
         try
@@ -30,24 +29,22 @@ public class OperationsController:ControllerBase
         }
     }
 
-    [HttpPost("Create")]
-    public async Task<IActionResult>Create([FromQuery]OperationCreateDto operationCreateDto)
+    [HttpPost]
+    public async Task<IActionResult> Create([FromQuery] OperationCreateDto operationCreateDto)
     {
-        
         try
         {
-            await _operationService.Create(operationCreateDto.id,operationCreateDto.date,operationCreateDto.amount);
+            await _operationService.Create(operationCreateDto.id, operationCreateDto.date, operationCreateDto.amount);
             return Ok();
         }
         catch (Exception e)
         {
             return StatusCode(500, "Internal Error");
         }
-        
     }
-    
-    [HttpPut("Update")]
-    public async Task<IActionResult> Update([FromQuery]OperationUpdateDTO operationUpdateDto)
+
+    [HttpPut]
+    public async Task<IActionResult> Update([FromQuery] OperationUpdateDTO operationUpdateDto)
     {
         var operationDTO = new Operation
         {
@@ -63,12 +60,12 @@ public class OperationsController:ControllerBase
         }
         catch
         {
-            return StatusCode(500, "Internal Error");  
+            return StatusCode(500, "Internal Error");
         }
     }
-    
+
     [HttpDelete("{id:guid}")]
-    public async Task<IActionResult> Delete([FromRoute]Guid id)
+    public async Task<IActionResult> Delete([FromRoute] Guid id)
     {
         try
         {
@@ -77,7 +74,7 @@ public class OperationsController:ControllerBase
         }
         catch
         {
-            return StatusCode(500, "Internal Error");  
+            return StatusCode(500, "Internal Error");
         }
     }
 }

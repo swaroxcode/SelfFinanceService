@@ -1,60 +1,59 @@
-using System.Text.Json;
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using WebApplication2.DTO;
 using WebApplication2.Services;
 
 namespace WebApplication2.Controllers;
+
 [ApiController]
 [Route("api/[controller]")]
 public class TypesController : ControllerBase
 {
-    private ITypeService _typeService;
-    private IMapper _imapper;
+    private readonly ITypeService _typeService;
+    private readonly IMapper _imapper;
 
-    public TypesController(ITypeService typeService,IMapper imapper)
+    public TypesController(ITypeService typeService, IMapper imapper)
     {
         _typeService = typeService;
         _imapper = imapper;
     }
 
-    [HttpGet("Get All")]
+    [HttpGet]
     public async Task<List<TypeDTO>> GetAll()
     {
-        var allTypes =await _typeService.GetAll();
+        var allTypes = await _typeService.GetAll();
         return _imapper.Map<List<TypeDTO>>(allTypes);
     }
 
-    [HttpPost("Create")]
+    [HttpPost]
     public async Task<IActionResult> CreateNew([FromQuery] CreateTypeDto createTypeDto)
     {
         try
         {
-            await _typeService.CreateNew(createTypeDto.TypeName,createTypeDto.ExpenceOrIncome);
+            await _typeService.CreateNew(createTypeDto.TypeName, createTypeDto.ExpenceOrIncome);
             return Ok();
         }
-        catch(Exception e)
+        catch (Exception e)
         {
             return StatusCode(500, "Internal Service Error");
         }
-        
     }
 
-    [HttpPut("Update")]
-    public async Task<IActionResult> Update([FromQuery]TypeDTO typeDto)
+    [HttpPut]
+    public async Task<IActionResult> Update([FromQuery] TypeDTO typeDto)
     {
         try
         {
-            await _typeService.Update(typeDto.Id,typeDto.TypeName,typeDto.ExpenceOrIncome);
+            await _typeService.Update(typeDto.Id, typeDto.TypeName, typeDto.ExpenceOrIncome);
             return Ok();
         }
-        catch(Exception e)
+        catch (Exception e)
         {
             return StatusCode(500, "Internal Service Error");
         }
     }
 
-    [HttpDelete("Remove")]
+    [HttpDelete("{id:guid}")]
     public async Task<IActionResult> Remove([FromRoute] Guid id)
     {
         try
@@ -62,10 +61,9 @@ public class TypesController : ControllerBase
             await _typeService.Remove(id);
             return Ok(StatusCode(204));
         }
-        catch(Exception e)
+        catch (Exception e)
         {
             return StatusCode(500, "Internal Service Error");
         }
     }
-    
 }

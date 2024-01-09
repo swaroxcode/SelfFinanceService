@@ -15,7 +15,8 @@ public class OperationsService : IOperationService
     }
     public bool isExist(Guid id)
     {
-        if (_apiContext.Operations.Where(o => o.Id.Equals(id)).FirstAsync() != null)
+        if (_apiContext.Operations.Where(o => 
+                o.Id.Equals(id)).FirstAsync() != null)
         {
             return true;
         }
@@ -25,15 +26,19 @@ public class OperationsService : IOperationService
         }
     }
 
-    public async Task<bool> Create(Guid typeId,DateOnly dateTime,decimal amount)
+    public async Task<bool> Create(Guid typeId, DateOnly dateTime, decimal amount)
     {
-        if (! await isExist(typeId,dateTime,amount))
+        if (await isExist(typeId, dateTime, amount))
+        {
+            return false;
+        }
+        else
         {
             Guid newGuid = Guid.NewGuid();
             var currentDateTime = dateTime;
             await _apiContext.Operations.AddAsync(new Operation()
             {
-                Amount = amount, 
+                Amount = amount,
                 DateOfOperations = currentDateTime,
                 Id = newGuid,
                 TypeId = typeId
@@ -41,7 +46,6 @@ public class OperationsService : IOperationService
             await _apiContext.SaveChangesAsync();
             return true;
         }
-        else return false;
     }
 
     public async Task<Operation> Get(Guid id)
@@ -51,16 +55,26 @@ public class OperationsService : IOperationService
             throw new WebException("Element isnt find");
         }
 
-        var operation = await _apiContext.Operations.Where(o => o.Id.Equals(id)).FirstAsync();
+        var operation = await _apiContext.Operations.Where
+            (o => o.Id.Equals(id)).FirstAsync();
         return operation;
     }
 
     public async Task<bool> Update(Operation operation)
     {
-        if (isExist(operation.Id))
+        if (!isExist(operation.Id))
         {
-            var changeOperation = await _apiContext.Operations.Where(o => o.Id.Equals(operation.Id)).FirstAsync();
-            if (await _typeService.isExist(operation.TypeId))
+            return false;
+        }
+        else
+        {
+            var changeOperation = await _apiContext.Operations.Where
+                (o => o.Id.Equals(operation.Id)).FirstAsync();
+            if (!await _typeService.isExist(operation.TypeId))
+            {
+                return false;
+            }
+            else
             {
                 changeOperation.TypeId = operation.TypeId;
                 changeOperation.DateOfOperations = operation.DateOfOperations;
@@ -68,29 +82,29 @@ public class OperationsService : IOperationService
                 await _apiContext.SaveChangesAsync();
                 return true;
             }
-            else
-            {
-                return false;
-            }
         }
-        else return false;
     }
 
     public async Task<bool> Remove(Guid id)
     {
-        if (isExist(id))
+        if (!isExist(id))
         {
-            _apiContext.Remove(await _apiContext.Operations.Where(o => o.Id.Equals(id)).FirstAsync());
+            return false;
+        }
+        else
+        {
+            _apiContext.Remove(await _apiContext.Operations.Where
+                (o => o.Id.Equals(id)).FirstAsync());
             await _apiContext.SaveChangesAsync();
             return true;
         }
-        else return false;
     }
 
     public async Task<bool> isExist(Guid typeId, DateOnly dateTime, decimal amount)
     {
         if (await _apiContext.Operations.Where(o =>
-                    o.TypeId.Equals(typeId) & o.DateOfOperations.CompareTo(dateTime) == 0 &
+                    o.TypeId.Equals(typeId) & 
+                    o.DateOfOperations.CompareTo(dateTime) == 0 &
                     o.Amount == amount)
                 .FirstAsync() != null)
         {

@@ -3,44 +3,41 @@ using WebApplication2.DTO;
 
 namespace WebApplication2.Services;
 
-public class ReportService:IReportService
+public class ReportService : IReportService
 {
     private readonly ApiContext _apiContext;
-    private ITypeService _typeService;
-    
-    public ReportService(ApiContext apiContext,ITypeService typeService)
+    private readonly ITypeService _typeService;
+
+    public ReportService(ApiContext apiContext, ITypeService typeService)
     {
         _apiContext = apiContext;
         _typeService = typeService;
     }
-    public async Task<ReportDTO> DailyReport()
+
+    public async Task<ReportDTO> DailyReport(DateOnly dateOfOperation)
     {
-        ReportDTO currentReportDto = new ReportDTO();
-        currentReportDto.OperationDate = DateOnly.Parse(DateTime.Today.ToString());
-        List<Operation> dailyOperations = await (from operation in _apiContext.Operations where operation.DateOfOperations.Equals(currentReportDto.OperationDate)select operation).ToListAsync();
+        var currentReportDto = new ReportDTO();
+        currentReportDto.OperationDate = dateOfOperation;
+        List<Operation> dailyOperations = await (from
+                operation in _apiContext.Operations
+            where operation.DateOfOperations.Equals(
+                currentReportDto.OperationDate)
+            select operation).ToListAsync();
         return LookingForReport(dailyOperations);
     }
 
-    public async Task<ReportDTO> CustomDaysReport(string startDate, string endDate)
+    public async Task<ReportDTO> CustomDaysReport(DateOnly startDate, DateOnly endDate)
     {
-        var _startDay =DateOnly.Parse(startDate);
-        var _endDay = DateOnly.Parse(endDate);
-        List<Operation> customDateOperations = await _apiContext.Operations.Where(o =>
-            o.DateOfOperations.CompareTo(_startDay) > 0 &
-            o.DateOfOperations.CompareTo( _endDay) < 0).ToListAsync();
-        return LookingForReport(customDateOperations,startDate,endDate);
-
+        var customDateOperations = await _apiContext.Operations.Where(o =>
+            (o.DateOfOperations.CompareTo(startDate) > 0) &
+            (o.DateOfOperations.CompareTo(endDate) < 0)).ToListAsync();
+        return LookingForReport(customDateOperations, startDate.ToString(), endDate.ToString());
     }
-    
+
 
     public decimal TotalCharge(List<decimal> chargeList)
     {
-        decimal totalcharge = 0;
-        foreach (var charge in chargeList)
-        {
-            totalcharge = totalcharge + charge;
-        }
-
+        decimal totalcharge = chargeList.Sum();
         return totalcharge;
     }
 
@@ -52,9 +49,12 @@ public class ReportService:IReportService
             currentReport.StartDate = DateOnly.Parse(startDay);
             currentReport.EndDate = DateOnly.Parse(endDay);
         }
-    List<decimal> allIncome = neededOperation.Where(o=> _typeService.Get(o.TypeId).Result.ExpenceOrIncome == ExpenceOrIncome.Income)
+
+        var allIncome = neededOperation.Where
+                (o => _typeService.Get(o.TypeId).Result.ExpenceOrIncome == ExpenceOrIncome.Income)
             .Select(o => o.Amount).ToList();
-        List<decimal> allExpence = neededOperation.Where(o=>_typeService.Get(o.TypeId).Result.ExpenceOrIncome == ExpenceOrIncome.Expence)
+        var allExpence = neededOperation.Where
+                (o => _typeService.Get(o.TypeId).Result.ExpenceOrIncome == ExpenceOrIncome.Expence)
             .Select(o => o.Amount).ToList();
         currentReport.TotalExpence = TotalCharge(allExpence);
         currentReport.TotalIncome = TotalCharge(allIncome);
