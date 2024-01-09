@@ -30,7 +30,7 @@ public class ReportController : ControllerBase
         }
     }
 
-    [HttpGet("Period")]
+    [HttpGet("{startDate},{endDate}")]
     public async Task<IActionResult> CustomDateReport([FromQuery] DateOnly startDate, [FromQuery] DateOnly endDate)
     {
         try
