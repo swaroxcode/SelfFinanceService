@@ -26,7 +26,7 @@ public class TypesController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<IActionResult> CreateNew([FromQuery] CreateTypeDto createTypeDto)
+    public async Task<IActionResult> CreateNew([FromBody] CreateTypeDto createTypeDto)
     {
         try
         {
@@ -40,7 +40,7 @@ public class TypesController : ControllerBase
     }
 
     [HttpPut]
-    public async Task<IActionResult> Update([FromQuery] TypeDTO typeDto)
+    public async Task<IActionResult> Update([FromBody] TypeDTO typeDto)
     {
         try
         {

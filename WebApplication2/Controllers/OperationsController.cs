@@ -16,7 +16,7 @@ public class OperationsController : ControllerBase
     }
 
     [HttpGet("{id:guid}")]
-    public async Task<IActionResult> Get(Guid id)
+    public async Task<IActionResult> Get([FromRoute]Guid id)
     {
         try
         {
@@ -30,7 +30,7 @@ public class OperationsController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<IActionResult> Create([FromQuery] OperationCreateDto operationCreateDto)
+    public async Task<IActionResult> Create([FromBody] OperationCreateDto operationCreateDto)
     {
         try
         {
@@ -44,7 +44,7 @@ public class OperationsController : ControllerBase
     }
 
     [HttpPut]
-    public async Task<IActionResult> Update([FromQuery] OperationUpdateDTO operationUpdateDto)
+    public async Task<IActionResult> Update([FromBody] OperationUpdateDTO operationUpdateDto)
     {
         var operationDTO = new Operation
         {

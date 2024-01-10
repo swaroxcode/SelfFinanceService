@@ -14,7 +14,7 @@ public class ReportController : ControllerBase
         _reportService = reportService;
     }
 
-    [HttpGet("{dayOfOperation}")]
+    [HttpGet("daily")]
     public async Task<IActionResult> DailyReport([FromQuery] DateTime dayOfOperation)
     {
         try
@@ -29,7 +29,7 @@ public class ReportController : ControllerBase
         }
     }
 
-    [HttpGet("{startDate:datetime},{endDate:datetime}")]
+    [HttpGet("period")]
     public async Task<IActionResult> CustomDateReport([FromQuery] DateTime startDate, [FromQuery] DateTime endDate)
     {
         try
