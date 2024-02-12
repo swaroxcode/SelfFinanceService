@@ -14,13 +14,13 @@ public class TypeService : ITypeService
 
     public async Task<bool> CreateNew(string typeName, ExpenceOrIncome expenceOrIncome)
     {
-        if (!await isExist(typeName, expenceOrIncome)) return false;
+        if (await IsExist(typeName, expenceOrIncome)) return false;
 
         var type = new Type
         {
             TypeName = typeName,
             ExpenceOrIncome = expenceOrIncome,
-            Id = Guid.NewGuid()
+                Id = Guid.NewGuid()
         };
         await _apiContext.Types.AddAsync(type);
         await _apiContext.SaveChangesAsync();
@@ -45,16 +45,12 @@ public class TypeService : ITypeService
     {
         if (!await isExist(id)) return false;
 
-        if (!await isExist(newTypeName, newExpenceOrIncome))
-        {
-            return false;
-        }
-
         var newType = await _apiContext.Types
             .Where(t => t.Id.Equals(id))
             .FirstAsync();
         newType.TypeName = newTypeName;
         newType.ExpenceOrIncome = newExpenceOrIncome;
+        _apiContext.Types.Update(newType);
         await _apiContext.SaveChangesAsync();
         return true;
     }
@@ -66,6 +62,7 @@ public class TypeService : ITypeService
         _apiContext.Types.Remove(await _apiContext.Types
             .Where(t => t.Id.Equals(id))
             .FirstAsync());
+        await _apiContext.SaveChangesAsync();
         return true;
     }
 
@@ -77,12 +74,12 @@ public class TypeService : ITypeService
         return false;
     }
 
-    public async Task<bool> isExist(string typeName, ExpenceOrIncome expenceOrIncome)
+    public async Task<bool> IsExist(string typeName, ExpenceOrIncome expenceOrIncome)
     {
         if (await _apiContext.Types.Where
                     (t => t.TypeName.Equals(typeName) & t.ExpenceOrIncome.Equals(expenceOrIncome))
-                .FirstAsync() == null)
+                .AnyAsync() == true)
             return true;
-        return false;
+        else return false;
     }
 }

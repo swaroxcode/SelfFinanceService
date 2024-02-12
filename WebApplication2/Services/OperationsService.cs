@@ -14,12 +14,14 @@ public class OperationsService : IOperationService
         _typeService = typeService;
     }
 
-    public bool isExist(Guid id)
+    public async Task<bool> isExist(Guid id)
     {
-        if (_apiContext.Operations.Where(o =>
-                o.Id.Equals(id)).FirstAsync() != null)
+        if (await _apiContext.Operations.Where(o =>
+                o.Id.Equals(id)).AnyAsync() == true )
+        {
             return true;
-        return false;
+        }
+        else return false;
     }
 
     public async Task<bool> Create(Guid typeId, DateTime dateTime, decimal amount)
@@ -41,16 +43,15 @@ public class OperationsService : IOperationService
 
     public async Task<Operation> Get(Guid id)
     {
-        if (!isExist(id)) throw new WebException("Element isnt find");
+        if (await isExist(id)==false) throw new WebException("Element isnt find");
 
-        var operation = await _apiContext.Operations.Where
-            (o => o.Id.Equals(id)).FirstAsync();
+        var operation = await _apiContext.Operations.Where(o => o.Id.Equals(id)).FirstAsync();
         return operation;
     }
 
     public async Task<bool> Update(Operation operation)
     {
-        if (!isExist(operation.Id)) return false;
+        if (await isExist(operation.Id)==false) return false;
 
         var changeOperation = await _apiContext.Operations.Where
             (o => o.Id.Equals(operation.Id)).FirstAsync();
@@ -68,7 +69,7 @@ public class OperationsService : IOperationService
 
     public async Task<bool> Remove(Guid id)
     {
-        if (!isExist(id)) return false;
+        if (await isExist(id)==false) return false;
 
         _apiContext.Remove(await _apiContext.Operations.Where
             (o => o.Id.Equals(id)).FirstAsync());
@@ -82,8 +83,11 @@ public class OperationsService : IOperationService
                     o.TypeId.Equals(typeId) &
                     (o.DateOfOperations.CompareTo(dateTime) == 0) &
                     (o.Amount == amount))
-                .FirstAsync() != null)
+                .AnyAsync() == true)
+        {
             return true;
-        return false;
+        }
+            
+       else return false;
     }
 }

@@ -1,4 +1,5 @@
 using AutoMapper;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using WebApplication2.DTO;
 using WebApplication2.Services;
@@ -19,10 +20,17 @@ public class TypesController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<List<TypeDTO>> GetAll()
+    public async Task<IActionResult> GetAll()
     {
-        var allTypes = await _typeService.GetAll();
-        return _imapper.Map<List<TypeDTO>>(allTypes);
+        try
+        {
+            var allTypes = await _typeService.GetAll();
+            return Ok(allTypes);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, "Internal Error");
+        }
     }
 
     [HttpPost]
@@ -33,7 +41,7 @@ public class TypesController : ControllerBase
             await _typeService.CreateNew(createTypeDto.TypeName, createTypeDto.ExpenceOrIncome);
             return Ok();
         }
-        catch (Exception e)
+        catch
         {
             return StatusCode(500, "Internal Service Error");
         }
