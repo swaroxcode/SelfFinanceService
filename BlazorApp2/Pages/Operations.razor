@@ -1,18 +1,18 @@
 ﻿@page "/operations"
 @using BlazorApp2.Services
-@using WebApplication2
+@using ConsoleApp1.DAL.Entity
 @inject IOperationServices OperationService
 
 <MudTabs Elevation="2" Rounded="true" ApplyEffectsToContainer="true" PanelClass="pa-6">
     <MudTabPanel Text="Create">
-                    <MudForm @ref="form" @bind-IsValid="@success">
-                        <MudTextField T="DateTime" Label="Date of Operation" Required="true" RequiredError="Date of operations is requiered " @bind-Value="DateTime"/>
-                        <MudTextField T="decimal" Label="Amount" Required="true" RequiredError="Amount of operations is requiered " @bind-Value="Amount"/>
-                        <MudTextField T="Guid" Label="Type Id" Required="true" RequiredError="Type of operations is requiered " @bind-Value="TypeId"/>
-                            <div class="d-flex align-center justify-space-between">
-                                <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="@CreateNewOperation" Class="ml-auto">Create</MudButton>
-                            </div>
-                    </MudForm>   
+        <MudForm @ref="form" @bind-IsValid="@success">
+            <MudTextField T="DateTime" Label="Date of Operation" Required="true" RequiredError="Date of operations is requiered " @bind-Value="DateTime"/>
+            <MudTextField T="decimal" Label="Amount" Required="true" RequiredError="Amount of operations is requiered " @bind-Value="Amount"/>
+            <MudTextField T="Guid" Label="Type Id" Required="true" RequiredError="Type of operations is requiered " @bind-Value="TypeId"/>
+            <div class="d-flex align-center justify-space-between">
+                <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="@CreateNewOperation" Class="ml-auto">Create</MudButton>
+            </div>
+        </MudForm>
     </MudTabPanel>
     <MudTabPanel Text="Update">
         <MudForm @ref="form" @bind-IsValid="@success">
@@ -23,7 +23,7 @@
             <div class="d-flex align-center justify-space-between">
                 <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="@UpdateOperation" Class="ml-auto">Update</MudButton>
             </div>
-        </MudForm>   
+        </MudForm>
     </MudTabPanel>
     <MudTabPanel Text="Remove">
         <MudForm @ref="form" @bind-IsValid="@success">
@@ -31,106 +31,106 @@
             <div class="d-flex align-center justify-space-between">
                 <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="@RemoveOperation" Class="ml-auto">Remove</MudButton>
             </div>
-        </MudForm>   
+        </MudForm>
     </MudTabPanel>
-      <MudTabPanel Text="Get Opertaion">
-                        <MudForm @ref="form" @bind-IsValid="@success">
-                            <MudTextField T="Guid" Label="Id" Required="true" RequiredError="Id of operations is requiered " @bind-Value="Id"/>
-                                <div class="d-flex align-center justify-space-between">
-                                    <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="@GetNeededOperation" Class="ml-auto">Search</MudButton>
-<MudContainer>
-    <MudPaper>
-        <div>
-            <h3>Person Details</h3>
-            @if (showDetails)
-            {
-                <p>Id: @_operation.Id</p>
-                <p>TypeId: @_operation.TypeId</p>
-                <p>Amount: @_operation.Amount</p>
-                <p>DateTime: @_operation.DateOfOperations</p>
-            }
-        </div>
-    </MudPaper>
-</MudContainer>
-                                </div>
-                        </MudForm>   
-        </MudTabPanel>
+    <MudTabPanel Text="Get Opertaion">
+        <MudForm @ref="form" @bind-IsValid="@success">
+            <MudTextField T="Guid" Label="Id" Required="true" RequiredError="Id of operations is requiered " @bind-Value="Id"/>
+            <div class="d-flex align-center justify-space-between">
+                <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="@GetNeededOperation" Class="ml-auto">Search</MudButton>
+                <MudContainer>
+                    <MudPaper>
+                        <div>
+                            <h3>Person Details</h3>
+                            @if (showDetails)
+                            {
+                                <p>Id: @_operation.Id</p>
+                                <p>TypeId: @_operation.TypeId</p>
+                                <p>Amount: @_operation.Amount</p>
+                                <p>DateTime: @_operation.DateOfOperations</p>
+                            }
+                        </div>
+                    </MudPaper>
+                </MudContainer>
+            </div>
+        </MudForm>
+    </MudTabPanel>
 </MudTabs>
-
 
 
 @code {
 
-        private DateTime DateTime { get; set; }
-        private decimal Amount { get; set; }
-        private Guid Id { get; set; }
-        private Guid TypeId { get; set; }  
-        private Operation _operation { get; set; }
-        private List<Operation>? _allOperations;
-        [Inject] private IDialogService DialogService { get; set; }
-        string state = "Something wrong";
-        private bool showDetails = false;    
-        protected override async Task OnInitializedAsync()
-        {
-            
-        }
-        
-        public async Task CreateNewOperation()
-        {
-            var result = await OperationService.CreateNewOperation(TypeId,DateTime,Amount);
-            if (result is true)
-            {
-                await DialogService.ShowMessageBox("Result", "Element is Added");
-            }
-            else
-            {
-                await DialogService.ShowMessageBox("Result", "Element is present or Error");
-            }
-        }
+    private DateTime DateTime { get; set; }
+    private decimal Amount { get; set; }
+    private Guid Id { get; set; }
+    private Guid TypeId { get; set; }
+    private Operation _operation { get; set; }
+    private List<Operation>? _allOperations;
+    [Inject] private IDialogService DialogService { get; set; }
+    string state = "Something wrong";
+    private bool showDetails;
 
-        public async Task UpdateOperation()
-        {
-            var result = await OperationService.UpdateOperation(Id, TypeId,DateTime,Amount);
-            if (result is true)
-            {
-                await DialogService.ShowMessageBox("Result", "Element is Updated");
-            }
-            else
-            {
-                await DialogService.ShowMessageBox("Result", "Element is wrong or Error");
-            }
-        }
-
-        public async Task RemoveOperation()
-        {
-            var result = await OperationService.RemoveOperation(Id);
-            if (result is true)
-            {
-                await DialogService.ShowMessageBox("Result", "Element is Removed");
-            }
-            else
-            {
-                await DialogService.ShowMessageBox("Result", "Element is wrong or has Operations(Please remove Operations than remove type)");
-            }
-        }
-
-        public async Task GetNeededOperation()
-        {
-            _operation = await OperationService.GetSomeOperation(Id);
-            if (_operation!= null)
-            {
-                Id = _operation.Id;
-                TypeId = _operation.TypeId;
-                Amount = _operation.Amount;
-                DateTime =_operation.DateOfOperations;
-                showDetails = true;
-            }
-            else
-            {
-                await DialogService.ShowMessageBox("Result", "Element is wrong or has Operations(Please remove Operations than remove type)");
-            }
-        }
-        MudForm form;
-        bool success;
-        
+    protected override async Task OnInitializedAsync()
+    {
     }
+
+    public async Task CreateNewOperation()
+    {
+        var result = await OperationService.CreateNewOperation(TypeId, DateTime, Amount);
+        if (result is true)
+        {
+            await DialogService.ShowMessageBox("Result", "Element is Added");
+        }
+        else
+        {
+            await DialogService.ShowMessageBox("Result", "Element is present or Error");
+        }
+    }
+
+    public async Task UpdateOperation()
+    {
+        var result = await OperationService.UpdateOperation(Id, TypeId, DateTime, Amount);
+        if (result is true)
+        {
+            await DialogService.ShowMessageBox("Result", "Element is Updated");
+        }
+        else
+        {
+            await DialogService.ShowMessageBox("Result", "Element is wrong or Error");
+        }
+    }
+
+    public async Task RemoveOperation()
+    {
+        var result = await OperationService.RemoveOperation(Id);
+        if (result is true)
+        {
+            await DialogService.ShowMessageBox("Result", "Element is Removed");
+        }
+        else
+        {
+            await DialogService.ShowMessageBox("Result", "Element is wrong or has Operations(Please remove Operations than remove type)");
+        }
+    }
+
+    public async Task GetNeededOperation()
+    {
+        _operation = await OperationService.GetSomeOperation(Id);
+        if (_operation != null)
+        {
+            Id = _operation.Id;
+            TypeId = _operation.TypeId;
+            Amount = _operation.Amount;
+            DateTime = _operation.DateOfOperations;
+            showDetails = true;
+        }
+        else
+        {
+            await DialogService.ShowMessageBox("Result", "Element is wrong or has Operations(Please remove Operations than remove type)");
+        }
+    }
+
+    MudForm form;
+    bool success;
+
+}

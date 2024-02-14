@@ -1,4 +1,4 @@
-using WebApplication2.DTO;
+using ConsoleApp1.DTO;
 
 namespace BlazorApp2.Services;
 

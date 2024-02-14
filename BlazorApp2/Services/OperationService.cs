@@ -1,67 +1,82 @@
 using System.Text;
-using Microsoft.VisualBasic.CompilerServices;
-using MudBlazor;
-using WebApplication2;
-using WebApplication2.DTO;
-using Type = System.Type;
+using ConsoleApp1.DAL.Entity;
+using ConsoleApp1.DTO;
+using Newtonsoft.Json;
 
 namespace BlazorApp2.Services;
 
-public class OperationService:IOperationServices
+public class OperationService : IOperationServices
 {
-    public readonly IHttpClientFactory _httpClientFactory;
-    
+    private readonly IHttpClientFactory _httpClientFactory;
+    private readonly HttpClient _httpClient;
+
     public OperationService(IHttpClientFactory httpClient)
     {
         _httpClientFactory = httpClient;
+        _httpClient = _httpClientFactory.CreateClient("Main");
     }
 
     public async Task<Operation> GetSomeOperation(Guid id)
     {
-        var AdressToGet = "/api/Operations/"+id.ToString();
+        var adressToGet = $"/api/Operations/{id}";
         var httpClient = _httpClientFactory.CreateClient("Main");
-        var httpResponceMessage = httpClient.GetAsync(AdressToGet).Result;
-        using var contestStream = httpResponceMessage.Content.ReadAsStringAsync();
-        return  Newtonsoft.Json.JsonConvert.DeserializeObject<Operation>(contestStream.Result);
+        var httpResponceMessage = await httpClient.GetAsync(adressToGet);
+        if (!httpResponceMessage.IsSuccessStatusCode)
+            throw new Exception(httpResponceMessage.StatusCode.ToString());
+        try
+        {
+            using var contestStream = httpResponceMessage.Content.ReadAsStringAsync();
+            return JsonConvert.DeserializeObject<Operation>(contestStream.Result);
+        }
+        catch (JsonException e)
+        {
+            Console.WriteLine(e);
+            throw;
+        }
     }
 
     public async Task<bool> CreateNewOperation(Guid TypeId, DateTime date, decimal amount)
     {
-        var newType = new OperationCreateDto{id = TypeId,amount = amount,date = date};
-        var jsonType = Newtonsoft.Json.JsonConvert.SerializeObject(newType);
+        var newType = new OperationCreateDto
+        {
+            id = TypeId,
+            amount = amount,
+            date = date
+        };
+        var jsonType = JsonConvert.SerializeObject(newType);
         var httpClient = _httpClientFactory.CreateClient("Main");
         var content = new StringContent(jsonType, Encoding.UTF8, "application/json");
-        var httpResponceMessage =httpClient.PostAsync("/api/Operations", content).Result;
+        var httpResponceMessage = await httpClient.PostAsync("/api/Operations", content);
         if (httpResponceMessage.IsSuccessStatusCode)
-        {
             return true;
-        }
-        else return false;
+        return false;
     }
 
-    public async Task<bool> UpdateOperation(Guid id,Guid TypeId, DateTime dateTime, decimal amount)
+    public async Task<bool> UpdateOperation(Guid id, Guid TypeId, DateTime dateTime, decimal amount)
     {
-        var updateType = new OperationUpdateDTO{Amount =amount,DateOfOperations = dateTime,Id = id,TypeId = TypeId };
-        var jsonType = Newtonsoft.Json.JsonConvert.SerializeObject(updateType);
+        var updateType = new OperationUpdateDTO
+        {
+            Amount = amount,
+            DateOfOperations = dateTime,
+            Id = id,
+            TypeId = TypeId
+        };
+        var jsonType = JsonConvert.SerializeObject(updateType);
         var httpClient = _httpClientFactory.CreateClient("Main");
         var content = new StringContent(jsonType, Encoding.UTF8, "application/json");
-        var httpResponceMessage =httpClient.PutAsync("/api/Operations", content).Result;
+        var httpResponceMessage = await httpClient.PutAsync("/api/Operations", content);
         if (httpResponceMessage.IsSuccessStatusCode)
-        {
             return true;
-        }
-        else return false;
+        return false;
     }
 
     public async Task<bool> RemoveOperation(Guid id)
     {
-        var AdressToRemove ="/api/Operations"+id.ToString();
+        var adressToRemove = $"/api/Operations{id}";
         var httpClient = _httpClientFactory.CreateClient("Main");
-        var httpResponceMessage = httpClient.DeleteAsync(AdressToRemove).Result;
+        var httpResponceMessage = await httpClient.DeleteAsync(adressToRemove);
         if (httpResponceMessage.IsSuccessStatusCode)
-        {
             return true;
-        }
-        else return false;
+        return false;
     }
 }

@@ -1,5 +1,4 @@
 using System.Net.Http.Headers;
-
 using BlazorApp2.Services;
 using MudBlazor.Services;
 
@@ -25,6 +24,7 @@ if (!app.Environment.IsDevelopment())
     // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
+
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.MapBlazorHub();
@@ -32,10 +32,4 @@ app.UseRouting();
 app.MapFallbackToPage("/_Host");
 app.UseStaticFiles();
 
-//services.AddScoped<IHttpClientServiceImplementation, HttpClientCrudService>();
-//services.AddScoped<IHttpClientServiceImplementation, HttpClientPatchService>();
-//services.AddScoped<IHttpClientServiceImplementation, HttpClientStreamService>();
-//services.AddScoped<IHttpClientServiceImplementation, HttpClientCancellationService>();
 app.Run();
-
-

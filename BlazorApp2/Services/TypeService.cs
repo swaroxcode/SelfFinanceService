@@ -1,71 +1,77 @@
 using System.Text;
-using System.Text.Json;
-using Microsoft.AspNetCore.Http.HttpResults;
-using Microsoft.AspNetCore.Mvc;
-using WebApplication2;
-using WebApplication2.DTO;
-using Type = WebApplication2.Type;
-namespace BlazorApp2.Services;
+using ConsoleApp1.DAL.Entity;
+using ConsoleApp1.DTO;
+using Newtonsoft.Json;
+using JsonException = System.Text.Json.JsonException;
+using Type = ConsoleApp1.DAL.Entity.Type;
 
+namespace BlazorApp2.Services;
 
 public class TypeService : ITypeServices
 {
-    public readonly IHttpClientFactory _httpClientFactory;
+    private readonly IHttpClientFactory _httpClientFactory;
+    private readonly HttpClient _httpClient;
 
     public TypeService(IHttpClientFactory httpClient)
     {
         _httpClientFactory = httpClient;
+        _httpClient = _httpClientFactory.CreateClient("Main");
     }
+
     public async Task<List<Type>?> GetAll()
     {
-        List<Type>? allTypes = new List<Type>();
-        var httpClient = _httpClientFactory.CreateClient("Main");
-        var httpResponceMessage =  httpClient.GetAsync("/api/Types").Result;
+        var allTypes = new List<Type>();
+        var httpResponceMessage = await _httpClient.GetAsync("/api/Types");
         if (httpResponceMessage.IsSuccessStatusCode)
-        {
-             using var contestStream = httpResponceMessage.Content.ReadAsStringAsync();
-            allTypes =  Newtonsoft.Json.JsonConvert.DeserializeObject<List<Type>>(contestStream.Result);
-        }
-    
+            try
+            {
+                using var contestStream = httpResponceMessage.Content.ReadAsStringAsync();
+                allTypes = JsonConvert.DeserializeObject<List<Type>>(contestStream.Result);
+            }
+            catch (JsonException e)
+            {
+                Console.WriteLine(e.Message);
+            }
+
         return allTypes;
     }
 
     public async Task<bool> CreateNewType(string name, string expenceOrIncome)
     {
-        var newType = new CreateTypeDto{ExpenceOrIncome = (ExpenceOrIncome)Enum.Parse(typeof(ExpenceOrIncome), expenceOrIncome),TypeName = name};
-        var jsonType = Newtonsoft.Json.JsonConvert.SerializeObject(newType);
-        var httpClient = _httpClientFactory.CreateClient("Main");
-        var content = new StringContent(jsonType, Encoding.UTF8, "application/json");
-        var httpResponceMessage = httpClient.PostAsync("/api/Types", content).Result;
-        if (httpResponceMessage.IsSuccessStatusCode)
+        var newType = new CreateTypeDto
         {
+            ExpenceOrIncome = (ExpenceOrIncome)Enum.Parse(typeof(ExpenceOrIncome), expenceOrIncome), TypeName = name
+        };
+        var jsonType = JsonConvert.SerializeObject(newType);
+        var content = new StringContent(jsonType, Encoding.UTF8, "application/json");
+        var httpResponceMessage = await _httpClient.PostAsync("/api/Types", content);
+        if (httpResponceMessage.IsSuccessStatusCode)
             return true;
-        }
-        else return false;
-    }  
-    public async Task<bool> UpdateType(Guid id,string name, string expenceOrIncome)
+        return false;
+    }
+
+    public async Task<bool> UpdateType(Guid id, string name, string expenceOrIncome)
     {
-        var newType = new TypeDTO{ExpenceOrIncome = (ExpenceOrIncome)Enum.Parse(typeof(ExpenceOrIncome), expenceOrIncome),TypeName = name,Id = id};
-        var jsonType = Newtonsoft.Json.JsonConvert.SerializeObject(newType);
+        var newType = new TypeDTO
+        {
+            ExpenceOrIncome = (ExpenceOrIncome)Enum.Parse(typeof(ExpenceOrIncome), expenceOrIncome), TypeName = name,
+            Id = id
+        };
+        var jsonType = JsonConvert.SerializeObject(newType);
         var httpClient = _httpClientFactory.CreateClient("Main");
         var content = new StringContent(jsonType, Encoding.UTF8, "application/json");
-        var httpResponceMessage = httpClient.PutAsync("/api/Types", content).Result;
+        var httpResponceMessage = await httpClient.PutAsync("/api/Types", content);
         if (httpResponceMessage.IsSuccessStatusCode)
-        {
             return true;
-        }
-        else return false;
+        return false;
     }
 
     public async Task<bool> RemoveType(Guid id)
     {
-        var AdressToRemove = "/api/Types/"+id.ToString();
-        var httpClient = _httpClientFactory.CreateClient("Main");
-        var httpResponceMessage = httpClient.DeleteAsync(AdressToRemove).Result;
+        var addressToRemove = $"/api/Types/{id}";
+        var httpResponceMessage = await _httpClient.DeleteAsync(addressToRemove);
         if (httpResponceMessage.IsSuccessStatusCode)
-        {
             return true;
-        }
-        else return false;
-    }   
+        return false;
+    }
 }

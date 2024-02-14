@@ -1,5 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
-using WebApplication2.DTO;
+using ConsoleApp1.DTO;
 using WebApplication2.Services;
 
 namespace WebApplication2.Controllers;

@@ -1,33 +1,56 @@
-using System.Globalization;
-using Microsoft.EntityFrameworkCore.Metadata.Conventions;
-using WebApplication2.DTO;
+using ConsoleApp1.DTO;
+using Newtonsoft.Json;
+using JsonException = System.Text.Json.JsonException;
 
 namespace BlazorApp2.Services;
 
-public class ReportService: IReportService
+public class ReportService : IReportService
 {
-    public readonly IHttpClientFactory _httpClientFactory;
+    private readonly IHttpClientFactory _httpClientFactory;
+    private readonly HttpClient _httpClient;
 
     public ReportService(IHttpClientFactory httpClient)
     {
         _httpClientFactory = httpClient;
+        _httpClient = _httpClientFactory.CreateClient("Main");
     }
+
     public async Task<ReportDTO> DailyReport(DateTime neededDate)
     {
-        var AdressToGet = "/api/Report/daily?dayOfOperation="+neededDate.ToString("dd/MM/yyyy");
+        var adressToGet = "/api/Report/daily?dayOfOperation={}" + neededDate.ToString("dd/MM/yyyy");
         var httpClient = _httpClientFactory.CreateClient("Main");
-        var httpResponceMessage = httpClient.GetAsync(AdressToGet).Result;
-        using var contestStream = httpResponceMessage.Content.ReadAsStringAsync();
-        return  Newtonsoft.Json.JsonConvert.DeserializeObject<ReportDTO>(contestStream.Result);
-        
+        var httpResponceMessage = await httpClient.GetAsync(adressToGet);
+        if (!httpResponceMessage.IsSuccessStatusCode) throw new Exception(httpResponceMessage.StatusCode.ToString());
+
+        try
+        {
+            using var contestStream = httpResponceMessage.Content.ReadAsStringAsync();
+            return JsonConvert.DeserializeObject<ReportDTO>(contestStream.Result);
+        }
+        catch (JsonException e)
+        {
+            Console.WriteLine(e);
+            throw;
+        }
     }
 
     public async Task<ReportDTO> DatePeriodReport(DateTime startDate, DateTime endDate)
     {
-        var AdressToGet = "/api/Report/period?startDate="+startDate.ToString("dd/MM/yyyy")+"&endDate="+endDate.ToString("dd/MM/yyyy");
+        var adressToGet = "/api/Report/period?startDate=" + startDate.ToString("dd/MM/yyyy") + "&endDate=" +
+                          endDate.ToString("dd/MM/yyyy");
         var httpClient = _httpClientFactory.CreateClient("Main");
-        var httpResponceMessage = httpClient.GetAsync(AdressToGet).Result;
-        using var contestStream = httpResponceMessage.Content.ReadAsStringAsync();
-        return  Newtonsoft.Json.JsonConvert.DeserializeObject<ReportDTO>(contestStream.Result);
+        var httpResponceMessage = await httpClient.GetAsync(adressToGet);
+        if (!httpResponceMessage.IsSuccessStatusCode) throw new Exception(httpResponceMessage.StatusCode.ToString());
+
+        try
+        {
+            using var contestStream = httpResponceMessage.Content.ReadAsStringAsync();
+            return JsonConvert.DeserializeObject<ReportDTO>(contestStream.Result);
+        }
+        catch (JsonException e)
+        {
+            Console.WriteLine(e);
+            throw;
+        }
     }
 }
