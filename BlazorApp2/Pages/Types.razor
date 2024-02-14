@@ -60,6 +60,8 @@
 
 
 @code {
+    MudForm form;
+    bool success;
     private string TypeName { get; set; }
     private string _expenceOrIncome { get; set; }
     private Guid Id { get; set; }
@@ -110,8 +112,5 @@
             await DialogService.ShowMessageBox("Result", "Element is wrong or has Operations(Please remove Operations than remove type)");
         }
     }
-
-    MudForm form;
-    bool success;
 
 }
