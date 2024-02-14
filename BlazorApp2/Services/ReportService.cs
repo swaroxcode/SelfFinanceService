@@ -18,8 +18,7 @@ public class ReportService : IReportService
     public async Task<ReportDTO> DailyReport(DateTime neededDate)
     {
         var adressToGet = "/api/Report/daily?dayOfOperation={}" + neededDate.ToString("dd/MM/yyyy");
-        var httpClient = _httpClientFactory.CreateClient("Main");
-        var httpResponceMessage = await httpClient.GetAsync(adressToGet);
+        var httpResponceMessage = await _httpClient.GetAsync(adressToGet);
         if (!httpResponceMessage.IsSuccessStatusCode) throw new Exception(httpResponceMessage.StatusCode.ToString());
 
         try
@@ -38,8 +37,7 @@ public class ReportService : IReportService
     {
         var adressToGet = "/api/Report/period?startDate=" + startDate.ToString("dd/MM/yyyy") + "&endDate=" +
                           endDate.ToString("dd/MM/yyyy");
-        var httpClient = _httpClientFactory.CreateClient("Main");
-        var httpResponceMessage = await httpClient.GetAsync(adressToGet);
+        var httpResponceMessage = await _httpClient.GetAsync(adressToGet);
         if (!httpResponceMessage.IsSuccessStatusCode) throw new Exception(httpResponceMessage.StatusCode.ToString());
 
         try

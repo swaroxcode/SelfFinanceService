@@ -58,9 +58,8 @@ public class TypeService : ITypeServices
             Id = id
         };
         var jsonType = JsonConvert.SerializeObject(newType);
-        var httpClient = _httpClientFactory.CreateClient("Main");
         var content = new StringContent(jsonType, Encoding.UTF8, "application/json");
-        var httpResponceMessage = await httpClient.PutAsync("/api/Types", content);
+        var httpResponceMessage = await _httpClient.PutAsync("/api/Types", content);
         if (httpResponceMessage.IsSuccessStatusCode)
             return true;
         return false;

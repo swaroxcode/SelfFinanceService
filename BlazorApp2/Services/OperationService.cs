@@ -19,8 +19,7 @@ public class OperationService : IOperationServices
     public async Task<Operation> GetSomeOperation(Guid id)
     {
         var adressToGet = $"/api/Operations/{id}";
-        var httpClient = _httpClientFactory.CreateClient("Main");
-        var httpResponceMessage = await httpClient.GetAsync(adressToGet);
+        var httpResponceMessage = await _httpClient.GetAsync(adressToGet);
         if (!httpResponceMessage.IsSuccessStatusCode)
             throw new Exception(httpResponceMessage.StatusCode.ToString());
         try
@@ -44,9 +43,8 @@ public class OperationService : IOperationServices
             date = date
         };
         var jsonType = JsonConvert.SerializeObject(newType);
-        var httpClient = _httpClientFactory.CreateClient("Main");
         var content = new StringContent(jsonType, Encoding.UTF8, "application/json");
-        var httpResponceMessage = await httpClient.PostAsync("/api/Operations", content);
+        var httpResponceMessage = await _httpClient.PostAsync("/api/Operations", content);
         if (httpResponceMessage.IsSuccessStatusCode)
             return true;
         return false;
@@ -62,9 +60,8 @@ public class OperationService : IOperationServices
             TypeId = TypeId
         };
         var jsonType = JsonConvert.SerializeObject(updateType);
-        var httpClient = _httpClientFactory.CreateClient("Main");
         var content = new StringContent(jsonType, Encoding.UTF8, "application/json");
-        var httpResponceMessage = await httpClient.PutAsync("/api/Operations", content);
+        var httpResponceMessage = await _httpClient.PutAsync("/api/Operations", content);
         if (httpResponceMessage.IsSuccessStatusCode)
             return true;
         return false;
@@ -73,8 +70,7 @@ public class OperationService : IOperationServices
     public async Task<bool> RemoveOperation(Guid id)
     {
         var adressToRemove = $"/api/Operations{id}";
-        var httpClient = _httpClientFactory.CreateClient("Main");
-        var httpResponceMessage = await httpClient.DeleteAsync(adressToRemove);
+        var httpResponceMessage = await _httpClient.DeleteAsync(adressToRemove);
         if (httpResponceMessage.IsSuccessStatusCode)
             return true;
         return false;
