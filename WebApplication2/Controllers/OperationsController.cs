@@ -34,7 +34,7 @@ public class OperationsController : ControllerBase
     {
         try
         {
-            await _operationService.Create(operationCreateDto.id, operationCreateDto.date, operationCreateDto.amount);
+            await _operationService.Create(operationCreateDto.Id, operationCreateDto.DateOfOperation, operationCreateDto.Amount);
             return Ok();
         }
         catch (Exception e)

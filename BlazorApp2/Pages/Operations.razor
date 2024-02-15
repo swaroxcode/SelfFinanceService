@@ -2,11 +2,12 @@
 @using BlazorApp2.Services
 @using ConsoleApp1.DAL.Entity
 @inject IOperationServices OperationService
+@inject IDialogService DialogService
 
 <MudTabs Elevation="2" Rounded="true" ApplyEffectsToContainer="true" PanelClass="pa-6">
     <MudTabPanel Text="Create">
-        <MudForm @ref="form" @bind-IsValid="@success">
-            <MudTextField T="DateTime" Label="Date of Operation" Required="true" RequiredError="Date of operations is requiered " @bind-Value="DateTime"/>
+        <MudForm @ref="_form" @bind-IsValid="@_success">
+            <MudTextField T="DateTime" Label="Date of Operation" Required="true" RequiredError="Date of operations is requiered " @bind-Value="DateOfOperation"/>
             <MudTextField T="decimal" Label="Amount" Required="true" RequiredError="Amount of operations is requiered " @bind-Value="Amount"/>
             <MudTextField T="Guid" Label="Type Id" Required="true" RequiredError="Type of operations is requiered " @bind-Value="TypeId"/>
             <div class="d-flex align-center justify-space-between">
@@ -15,9 +16,9 @@
         </MudForm>
     </MudTabPanel>
     <MudTabPanel Text="Update">
-        <MudForm @ref="form" @bind-IsValid="@success">
-            <MudTextField T="Guid" Label="ID of Operation" Required="true" RequiredError="Date of operations is requiered " @bind-Value="Id"/>
-            <MudTextField T="DateTime" Label="Date of Operation" Required="true" RequiredError="Date of operations is requiered " @bind-Value="DateTime"/>
+        <MudForm @ref="_form" @bind-IsValid="@_success">
+            <MudTextField T="Guid" Label="ID of Operation" Required="true" RequiredError="ID of operations is requiered " @bind-Value="Id"/>
+            <MudTextField T="DateTime" Label="Date of Operation" Required="true" RequiredError="Date of operations is requiered " @bind-Value="DateOfOperation"/>
             <MudTextField T="decimal" Label="Amount" Required="true" RequiredError="Amount of operations is requiered " @bind-Value="Amount"/>
             <MudTextField T="Guid" Label="Type Id" Required="true" RequiredError="Type of operations is requiered " @bind-Value="TypeId"/>
             <div class="d-flex align-center justify-space-between">
@@ -26,7 +27,7 @@
         </MudForm>
     </MudTabPanel>
     <MudTabPanel Text="Remove">
-        <MudForm @ref="form" @bind-IsValid="@success">
+        <MudForm @ref="_form" @bind-IsValid="@_success">
             <MudTextField T="Guid" Label="Enter current Id" Required="true" RequiredError="Id is required!" @bind-Value="Id"/>
             <div class="d-flex align-center justify-space-between">
                 <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="@RemoveOperation" Class="ml-auto">Remove</MudButton>
@@ -34,7 +35,7 @@
         </MudForm>
     </MudTabPanel>
     <MudTabPanel Text="Get Opertaion">
-        <MudForm @ref="form" @bind-IsValid="@success">
+        <MudForm @ref="_form" @bind-IsValid="@_success">
             <MudTextField T="Guid" Label="Id" Required="true" RequiredError="Id of operations is requiered " @bind-Value="Id"/>
             <div class="d-flex align-center justify-space-between">
                 <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="@GetNeededOperation" Class="ml-auto">Search</MudButton>
@@ -42,12 +43,12 @@
                     <MudPaper>
                         <div>
                             <h3>Person Details</h3>
-                            @if (showDetails)
+                            @if (_showDetails)
                             {
-                                <p>Id: @_operation.Id</p>
-                                <p>TypeId: @_operation.TypeId</p>
-                                <p>Amount: @_operation.Amount</p>
-                                <p>DateTime: @_operation.DateOfOperations</p>
+                                <p>Id: @CurrentOperation.Id</p>
+                                <p>TypeId: @CurrentOperation.TypeId</p>
+                                <p>Amount: @CurrentOperation.Amount</p>
+                                <p>DateTime: @CurrentOperation.DateOfOperations</p>
                             }
                         </div>
                     </MudPaper>
@@ -59,24 +60,21 @@
 
 
 @code {
-
-    private DateTime DateTime { get; set; }
+    
+    MudForm _form;
+    bool _success;
+    private DateTime DateOfOperation { get; set; }
     private decimal Amount { get; set; }
     private Guid Id { get; set; }
     private Guid TypeId { get; set; }
-    private Operation _operation { get; set; }
+    private Operation CurrentOperation { get; set; }
     private List<Operation>? _allOperations;
-    [Inject] private IDialogService DialogService { get; set; }
-    string state = "Something wrong";
-    private bool showDetails;
-
-    protected override async Task OnInitializedAsync()
-    {
-    }
+    private string _state = "Something wrong";
+    private bool _showDetails;
 
     public async Task CreateNewOperation()
     {
-        var result = await OperationService.CreateNewOperation(TypeId, DateTime, Amount);
+        var result = await OperationService.CreateNewOperation(TypeId, DateOfOperation, Amount);
         if (result is true)
         {
             await DialogService.ShowMessageBox("Result", "Element is Added");
@@ -89,7 +87,7 @@
 
     public async Task UpdateOperation()
     {
-        var result = await OperationService.UpdateOperation(Id, TypeId, DateTime, Amount);
+        var result = await OperationService.UpdateOperation(Id, TypeId, DateOfOperation, Amount);
         if (result is true)
         {
             await DialogService.ShowMessageBox("Result", "Element is Updated");
@@ -115,22 +113,18 @@
 
     public async Task GetNeededOperation()
     {
-        _operation = await OperationService.GetSomeOperation(Id);
-        if (_operation != null)
+        CurrentOperation = await OperationService.GetSomeOperation(Id);
+        if (CurrentOperation != null)
         {
-            Id = _operation.Id;
-            TypeId = _operation.TypeId;
-            Amount = _operation.Amount;
-            DateTime = _operation.DateOfOperations;
-            showDetails = true;
+            Id = CurrentOperation.Id;
+            TypeId = CurrentOperation.TypeId;
+            Amount = CurrentOperation.Amount;
+            DateOfOperation = CurrentOperation.DateOfOperations;
+            _showDetails = true;
         }
         else
         {
             await DialogService.ShowMessageBox("Result", "Element is wrong or has Operations(Please remove Operations than remove type)");
         }
     }
-
-    MudForm form;
-    bool success;
-
 }

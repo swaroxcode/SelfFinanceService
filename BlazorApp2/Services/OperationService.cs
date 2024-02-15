@@ -34,13 +34,13 @@ public class OperationService : IOperationServices
         }
     }
 
-    public async Task<bool> CreateNewOperation(Guid TypeId, DateTime date, decimal amount)
+    public async Task<bool> CreateNewOperation(Guid typeId, DateTime dateOfOperation, decimal amount)
     {
         var newType = new OperationCreateDto
         {
-            id = TypeId,
-            amount = amount,
-            date = date
+            Id = typeId,
+            Amount = amount,
+            DateOfOperation = dateOfOperation
         };
         var jsonType = JsonConvert.SerializeObject(newType);
         var content = new StringContent(jsonType, Encoding.UTF8, "application/json");
@@ -50,14 +50,14 @@ public class OperationService : IOperationServices
         return false;
     }
 
-    public async Task<bool> UpdateOperation(Guid id, Guid TypeId, DateTime dateTime, decimal amount)
+    public async Task<bool> UpdateOperation(Guid id, Guid typeId, DateTime dateOfOperation, decimal amount)
     {
         var updateType = new OperationUpdateDTO
         {
             Amount = amount,
-            DateOfOperations = dateTime,
+            DateOfOperations = dateOfOperation,
             Id = id,
-            TypeId = TypeId
+            TypeId = typeId
         };
         var jsonType = JsonConvert.SerializeObject(updateType);
         var content = new StringContent(jsonType, Encoding.UTF8, "application/json");

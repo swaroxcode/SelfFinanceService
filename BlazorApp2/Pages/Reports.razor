@@ -2,13 +2,14 @@
 @using BlazorApp2.Services
 @using ConsoleApp1.DAL.Entity
 @inject IReportService ReportService
+@inject IDialogService DialogService
 <PageTitle>Report</PageTitle>
 
 <MudTabs Elevation="2" Rounded="true" ApplyEffectsToContainer="true" PanelClass="pa-6">
     <MudTabPanel Text="Daily Report">
-        <MudTextField T="DateTime" Label="Date of Operation" Required="true" RequiredError="Date of operations is requiered " @bind-Value="neededDate"Format="dd/MM/yyyy"/>
+        <MudTextField T="DateTime" Label="Date of Operation" Required="true" RequiredError="Date of operations is requiered " @bind-Value="NeededDate"Format="dd/MM/yyyy"/>
         <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="@DailyReport" Class="ml-auto">Show Daily Report</MudButton>
-        @if (showContext)
+        @if (_showContext)
         {
             <MudTable Items="@ListOfCurrentOperations" Hover="true" Breakpoint="Breakpoint.Sm" LoadingProgressColor="Color.Info">
                 <HeaderContent>
@@ -29,10 +30,10 @@
         }
     </MudTabPanel>
     <MudTabPanel Text="Custom Report">
-        <MudTextField T="DateTime" Label="Start Date of Operation" Required="true" RequiredError="Date of operations is requiered " @bind-Value="startDate" Format="dd/MM/yyyy"/>
-        <MudTextField T="DateTime" Label="End Date of Operation" Required="true" RequiredError="Date of operations is requiered " @bind-Value="endDate" Format="dd/MM/yyyy"/>
+        <MudTextField T="DateTime" Label="Start Date of Operation" Required="true" RequiredError="Date of operations is requiered " @bind-Value="StartDate" Format="dd/MM/yyyy"/>
+        <MudTextField T="DateTime" Label="End Date of Operation" Required="true" RequiredError="Date of operations is requiered " @bind-Value="EndDate" Format="dd/MM/yyyy"/>
         <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="@CustomReport" Class="ml-auto">Show Daily Report</MudButton>
-        @if (showContext)
+        @if (_showContext)
         {
             <MudTable Items="@ListOfCurrentOperations" Hover="true" Breakpoint="Breakpoint.Sm" LoadingProgressColor="Color.Info">
                 <HeaderContent>
@@ -55,24 +56,24 @@
 </MudTabs>
 
 @code {
-    private bool showContext;
-    private DateTime neededDate { get; set; }
-    private DateTime startDate { get; set; }
-    private DateTime endDate { get; set; }
+    private bool _showContext;
+    private DateTime NeededDate { get; set; }
+    private DateTime StartDate { get; set; }
+    private DateTime EndDate { get; set; }
     private decimal? TotalIncome { get; set; }
     private decimal? TotalExpence { get; set; }
     private List<Operation>? ListOfCurrentOperations { get; set; }
-    [Inject] private IDialogService DialogService { get; set; }
+    
 
     private async Task DailyReport()
     {
-        var dailyReport = await ReportService.DailyReport(neededDate);
+        var dailyReport = await ReportService.DailyReport(NeededDate);
         if (dailyReport != null)
         {
             TotalExpence = dailyReport.TotalExpence;
             TotalIncome = dailyReport.TotalIncome;
             ListOfCurrentOperations = dailyReport.ListOfCurrentOperations;
-            showContext = true;
+            _showContext = true;
         }
         else
         {
@@ -82,13 +83,13 @@
 
     private async Task CustomReport()
     {
-        var dailyReport = await ReportService.DatePeriodReport(startDate, endDate);
+        var dailyReport = await ReportService.DatePeriodReport(StartDate, EndDate);
         if (dailyReport != null)
         {
             TotalExpence = dailyReport.TotalExpence;
             TotalIncome = dailyReport.TotalIncome;
             ListOfCurrentOperations = dailyReport.ListOfCurrentOperations;
-            showContext = true;
+            _showContext = true;
         }
         else
         {

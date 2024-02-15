@@ -20,7 +20,6 @@ public class ReportService : IReportService
         var adressToGet = "/api/Report/daily?dayOfOperation={}" + neededDate.ToString("dd/MM/yyyy");
         var httpResponceMessage = await _httpClient.GetAsync(adressToGet);
         if (!httpResponceMessage.IsSuccessStatusCode) throw new Exception(httpResponceMessage.StatusCode.ToString());
-
         try
         {
             using var contestStream = httpResponceMessage.Content.ReadAsStringAsync();
