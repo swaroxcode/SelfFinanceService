@@ -1,0 +1,104 @@
+﻿@page "/reports"
+@using BlazorApp2.Services
+@using BlazorApp2.DAL.Entity
+@using WebApplication2.DTO
+@inject IReportService ReportService
+@inject IDialogService DialogService
+<PageTitle>Report</PageTitle>
+
+<MudTabs Elevation="2" Rounded="true" ApplyEffectsToContainer="true" PanelClass="pa-6">
+    <MudTabPanel Text="Daily Report">
+        <MudDatePicker Label="Basic example" @bind-Date="NeededDate"/>
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="@DailyReport" Class="ml-auto">Show Daily Report</MudButton>
+        @if (_showContext)
+        {
+            <MudTable Items="@ListOfCurrentOperations" Hover="true" Breakpoint="Breakpoint.Sm" LoadingProgressColor="Color.Info">
+                <HeaderContent>
+                    <MudTh>Type Name</MudTh>
+                    <MudTh>Amount</MudTh>
+                    <MudTh>Date of Operation</MudTh>
+                </HeaderContent>
+                <RowTemplate>
+                    <MudTd DataLabel="Type Name">@context.TypeName</MudTd>
+                    <MudTd DataLabel="Amount">@context.Amount</MudTd>
+                    <MudTd DataLabel="Date of Operation">@context.DateOfOperations</MudTd>
+                </RowTemplate>
+            </MudTable>
+            <p>Total Expence: @TotalExpence</p>
+            <p>Total Income: @TotalIncome</p>
+        }
+    </MudTabPanel>
+    <MudTabPanel Text="Custom Report">
+        <MudDatePicker Label="Start Date" @bind-Date="StartDate" MaxDate="EndDate"/>
+        <MudDatePicker Label="End Date" @bind-Date="EndDate" MinDate="StartDate"/>
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="@CustomReport" Class="ml-auto">Show Daily Report</MudButton>
+        @if (_showContext)
+        {
+            <MudTable Items="@ListOfCurrentOperations" Hover="true" Breakpoint="Breakpoint.Sm" LoadingProgressColor="Color.Info">
+                <HeaderContent>
+                    <MudTh>Type Name</MudTh>
+                    <MudTh>Amount</MudTh>
+                    <MudTh>Date of Operation</MudTh>
+                </HeaderContent>
+                <RowTemplate>
+                    <MudTd DataLabel="Type Name">@context.TypeName</MudTd>
+                    <MudTd DataLabel="Amount">@context.Amount</MudTd>
+                    <MudTd DataLabel="Date of Operation">@context.DateOfOperations</MudTd>
+                </RowTemplate>
+            </MudTable>
+            <p>Total Expence: @TotalExpence</p>
+            <p>Total Income: @TotalIncome</p>
+        }
+    </MudTabPanel>
+</MudTabs>
+
+@code {
+
+    private bool _showContext;
+    private DateTime? NeededDate { get; set; }
+    private DateTime? StartDate { get; set; }
+    private DateTime? EndDate { get; set; }
+    private decimal? TotalIncome { get; set; }
+    private decimal? TotalExpence { get; set; }
+    private List<OperationToShowDTO> ListOfCurrentOperations { get; set; }
+    
+    protected override async Task OnInitializedAsync()
+    {
+        NeededDate = DateTime.Today;
+        EndDate = DateTime.Today.AddDays(1);
+        StartDate = DateTime.Today;
+        await Task.Delay(5);
+    }
+    private async Task DailyReport()
+    {
+        var dailyReport = await ReportService.DailyReport(NeededDate);
+        if (dailyReport != null)
+        {
+            TotalExpence = dailyReport.TotalExpence;
+            TotalIncome = dailyReport.TotalIncome;
+            ListOfCurrentOperations = dailyReport.ListOfCurrentOperations;
+            _showContext = true;
+        }
+        else
+        {
+            await DialogService.ShowMessageBox("Result", "Element is present or Error");
+        }
+    }
+
+    private async Task CustomReport()
+    {
+        var dailyReport = await ReportService.DatePeriodReport(StartDate, EndDate);
+        if (dailyReport != null)
+        {
+            TotalExpence = dailyReport.TotalExpence;
+            TotalIncome = dailyReport.TotalIncome;
+            ListOfCurrentOperations = dailyReport.ListOfCurrentOperations;
+            _showContext = true;
+        }
+        else
+        {
+            await DialogService.ShowMessageBox("Result", "Element is present or Error");
+        }
+    }
+
+}
